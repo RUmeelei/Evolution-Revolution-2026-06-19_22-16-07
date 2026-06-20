@@ -22,7 +22,20 @@ public class SimulationManager : MonoBehaviour
     private float slowTickTimer = 0f;
     private float epicTickTimer = 0f;
 
+    public float LastTickTime { get; private set; }
+    public float TickInterval => 1f / ticksPerSecond;
+
     private UnitManager unitManager;
+    private UnitVisualManager unitVisualManager;
+
+    void Awake()
+    {
+        unitManager = FindFirstObjectByType<UnitManager>();
+        unitVisualManager = FindFirstObjectByType<UnitVisualManager>();
+
+        unitManager.Initialize(50000);
+        unitVisualManager.Initialize(unitManager);
+    }
     
     void Update()
     {
@@ -58,14 +71,14 @@ public class SimulationManager : MonoBehaviour
 
         OnTick?.Invoke(delta);
 
+        LastTickTime = Time.time;
+
         if (unitManager == null)
         {
             unitManager = FindFirstObjectByType<UnitManager>();
         }
 
         unitManager.Tick(delta);
-
-        // Debug.Log($"Tick: {tickCounter}, weight; {delta}");
     }
     private void ProcessSlowTick(float delta)
     {
@@ -74,6 +87,13 @@ public class SimulationManager : MonoBehaviour
         if (slowTickTimer >= slowTickInterval)
         {
             OnSlowTick?.Invoke(delta);
+
+            if (unitManager == null)
+            {
+                unitManager = FindFirstObjectByType<UnitManager>();
+            }
+
+            unitManager.RandomMoveUnit(unitManager.GetRandomUnitIndex());
 
             slowTickTimer = 0f;
         }
