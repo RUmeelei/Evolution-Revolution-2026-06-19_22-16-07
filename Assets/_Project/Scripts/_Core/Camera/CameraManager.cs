@@ -11,7 +11,9 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float zoomSpeed = 500f;
     
     [SerializeField] private float minHeight = 1f;
-    [SerializeField] private float maxHeight = 50f;
+    [SerializeField] private float maxHeight = 500f;
+
+    public float MaxZoom => maxHeight;
 
     private Vector3 targetPosition;
     private Vector3 lastMousePosition;
