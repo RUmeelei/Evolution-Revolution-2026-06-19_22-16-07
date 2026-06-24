@@ -26,7 +26,14 @@ public class SpawnManager : MonoBehaviour
 
             worldPos.z = 0;
 
-            if (tileManager != null && tileManager.IsWorldPassable(worldPos)) SpawnUnitWithCost(worldPos, 0, 50f);
+            int playerFaction = -1;
+
+            for (int i = 0; i < factionManager.FactionCount; i++)
+            {
+                if (factionManager.GetFaction(i).isPlayer) playerFaction = i;
+            }
+
+            if (tileManager != null && tileManager.IsWorldPassable(worldPos) && playerFaction >= 0) SpawnUnitWithCost(worldPos, playerFaction, 50f);
         }
     }
 

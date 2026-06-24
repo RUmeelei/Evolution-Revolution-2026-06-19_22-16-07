@@ -25,6 +25,8 @@ public class SelectionManager : MonoBehaviour
 
     void Update()
     {
+        TileManager tm = FindFirstObjectByType<TileManager>();
+
         if (Input.GetMouseButtonDown(0))
         {
             startMousePos = Input.mousePosition;
@@ -52,6 +54,8 @@ public class SelectionManager : MonoBehaviour
             if (isDragging)
             {
                 isDragging = false;
+
+                lastClickedTile = null;
 
                 Rect worldRect = GetWorldRect(startMousePos, Input.mousePosition);
 
@@ -82,33 +86,31 @@ public class SelectionManager : MonoBehaviour
                 {
                     selectedUnits = unitManager.GetUnitAtPosition(world);
                 }
-            }
+            
+                Vector2 worldPoint = cam.ScreenToWorldPoint(Input.mousePosition);
 
-            Vector2 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
-
-            TileManager tm = FindFirstObjectByType<TileManager>();
-
-            if (tm != null)
-            {
-                if (worldPos.x >= 0 && worldPos.x < tm.width * tm.tileSize && worldPos.y >= 0 && worldPos.y < tm.height * tm.tileSize)
+                bool clickedOnUnit = unitManager.GetUnitAtPosition(worldPoint).Count > 0;
+                bool clickedOnTile = tm != null && tm.WorldToTile(worldPoint) != null;
+            
+                if (!clickedOnUnit && selectedUnits.Count > 0)
                 {
-                    lastClickedTile = tm.WorldToTile(worldPos);
-                }
-                else
-                {
+                    selectedUnits.Clear();
                     lastClickedTile = null;
                 }
-            }
             
-            Vector2 worldPoint = cam.ScreenToWorldPoint(Input.mousePosition);
+                Vector2 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
 
-            bool clickedOnUnit = unitManager.GetUnitAtPosition(worldPoint).Count > 0;
-            bool clickedOnTile = tm != null && tm.WorldToTile(worldPoint) != null;
-            
-            if (!clickedOnUnit && selectedUnits.Count > 0)
-            {
-                selectedUnits.Clear();
-                lastClickedTile = null;
+                if (tm != null)
+                {
+                    if (worldPos.x >= 0 && worldPos.x < tm.width * tm.tileSize && worldPos.y >= 0 && worldPos.y < tm.height * tm.tileSize)
+                    {
+                        lastClickedTile = tm.WorldToTile(worldPos);
+                    }
+                    else
+                    {
+                        lastClickedTile = null;
+                    }
+                }
             }
         }
 
