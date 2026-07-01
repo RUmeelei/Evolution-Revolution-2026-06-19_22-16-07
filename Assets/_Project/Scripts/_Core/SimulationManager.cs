@@ -9,6 +9,10 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private int simulationSpeed = 1;
     [SerializeField] private int ticksPerSecond = 10;
 
+    public bool Running => isRunning;
+
+    public int SimulationSpeed => simulationSpeed;
+
     public event Action<float> OnTick;
     public event Action<float> OnSlowTick;
     public event Action<float> OnEpicTick;
@@ -43,6 +47,10 @@ public class SimulationManager : MonoBehaviour
     private SpawnManager spawnManager;
 
     private WinConditionManager winConditionManager;
+
+    private PoliticsManager politicsManager;
+
+    private DiplomacyManager diplomacyManager;
 
     void Awake()
     {
@@ -82,6 +90,14 @@ public class SimulationManager : MonoBehaviour
         winConditionManager = FindFirstObjectByType<WinConditionManager>();
 
         winConditionManager.Initialize();
+
+        politicsManager = FindFirstObjectByType<PoliticsManager>();
+
+        politicsManager.Initialize();
+
+        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+
+        diplomacyManager.Initialize();
     }
     
     void Update()
@@ -167,6 +183,13 @@ public class SimulationManager : MonoBehaviour
 
             regionManager.UpdateRegions(tileManager);
 
+            if (politicsManager == null)
+            {
+                politicsManager = FindFirstObjectByType<PoliticsManager>();
+            }
+
+            politicsManager.UpdatePolitics(delta);
+
             slowTickTimer = 0f;
         }
     }
@@ -184,6 +207,13 @@ public class SimulationManager : MonoBehaviour
             }
             
             winConditionManager.CheckVictory();
+
+            if (politicsManager == null)
+            {
+                politicsManager = FindFirstObjectByType<PoliticsManager>();
+            }
+
+            politicsManager.ProcessConstruction();
 
             epicTickTimer = 0f;
         }
@@ -207,5 +237,15 @@ public class SimulationManager : MonoBehaviour
     public void SetSimulationSpeed(int speed)
     {
         simulationSpeed = Mathf.Max(1, speed);
+    }
+
+    public void IncreaseSimulationSpeed()
+    {
+        simulationSpeed = Mathf.Min(simulationSpeed + 1, 10);
+    }
+
+    public void DecreaseSimulationSpeed()
+    {
+        simulationSpeed = Mathf.Max(1, simulationSpeed - 1);
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraManager : MonoBehaviour
 {
@@ -44,20 +45,23 @@ public class CameraManager : MonoBehaviour
             speedMultiplier = speedMultiplier * 2;
         }
 
-        if (Input.GetKey(KeyCode.W) && !isDragging) targetPosition += Vector3.up * speedMultiplier * Time.deltaTime;
-        if (Input.GetKey(KeyCode.S) && !isDragging) targetPosition += Vector3.down * speedMultiplier * Time.deltaTime;
-        if (Input.GetKey(KeyCode.A) && !isDragging) targetPosition += Vector3.left * speedMultiplier * Time.deltaTime;
-        if (Input.GetKey(KeyCode.D) && !isDragging) targetPosition += Vector3.right * speedMultiplier * Time.deltaTime;
+        if (Input.GetKey(KeyCode.W) && !isDragging && !EventSystem.current.IsPointerOverGameObject()) targetPosition += Vector3.up * speedMultiplier * Time.deltaTime;
+        if (Input.GetKey(KeyCode.S) && !isDragging && !EventSystem.current.IsPointerOverGameObject()) targetPosition += Vector3.down * speedMultiplier * Time.deltaTime;
+        if (Input.GetKey(KeyCode.A) && !isDragging && !EventSystem.current.IsPointerOverGameObject()) targetPosition += Vector3.left * speedMultiplier * Time.deltaTime;
+        if (Input.GetKey(KeyCode.D) && !isDragging && !EventSystem.current.IsPointerOverGameObject()) targetPosition += Vector3.right * speedMultiplier * Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(2)) {
+        if (Input.GetMouseButtonDown(2) && !EventSystem.current.IsPointerOverGameObject())
+        {
             lastMousePosition = Input.mousePosition;
             isDragging = true;
         }
-        if (Input.GetMouseButtonUp(2)) {
+        if (Input.GetMouseButtonUp(2) || EventSystem.current.IsPointerOverGameObject())
+        {
             isDragging = false;
         }
 
-        if (isDragging) {
+        if (isDragging)
+        {
             Vector3 mouseDelta = Input.mousePosition - lastMousePosition;
             lastMousePosition = Input.mousePosition;
             

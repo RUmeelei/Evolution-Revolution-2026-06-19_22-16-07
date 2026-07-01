@@ -3,14 +3,24 @@ using System.Collections.Generic;
 
 public class TileManager : MonoBehaviour
 {
-    public int width = 100;
-    public int height = 100;
+    [Header("Main")]
+    [SerializeField] public int width = 100;
+    [SerializeField] public int height = 100;
+    [SerializeField] public float tileSize = 10f;
 
-    public float tileSize = 10f;
+    [Header("Noise Parameters")]
+    [SerializeField] private float continentalFrequency = 1.0f;
+    [SerializeField] private float mountainFrequency = 3.0f;
+    [SerializeField] private float moistureFrequency = 3.0f;
+    [SerializeField] private float detailFrequency = 10.0f;
+    [SerializeField] private float waterThreshold = 0.4f;
+    [SerializeField] private float mountainThreshold = 0.7f;
 
     private TileData[] tiles;
 
     public TileData[] Tiles => tiles;
+
+    private int[,] buildingCounts;
 
     private int maxFactions;
 
@@ -29,67 +39,137 @@ public class TileManager : MonoBehaviour
 
         maxFactions = factionManager.FactionCount;
 
-        Debug.Log($"Initialized TileManager with capacity for {width * height} tiles.");
-
         GenerateWorld();
+
+        buildingCounts = new int[factionManager.FactionCount, System.Enum.GetValues(typeof(BuildingType)).Length];
     }
 
-    public void GenerateWorld(int seed = -1, float scale = 0.05f)
+    public void GenerateWorld(int seed = -1)
     {
         if (seed == -1) seed = Random.Range(0, 100000);
 
-        float offsetX = seed * 0.1f;
-        float offsetY = seed * 0.2f;
+        Random.InitState(seed);
+        
+        float continentalOffsetX = Random.Range(0f, 1000f);
+        float continentalOffsetY = Random.Range(0f, 1000f);
+        float mountainOffsetX = Random.Range(0f, 1000f);
+        float mountainOffsetY = Random.Range(0f, 1000f);
+        float moistureOffsetX = Random.Range(0f, 1000f);
+        float moistureOffsetY = Random.Range(0f, 1000f);
+        float detailOffsetX = Random.Range(0f, 1000f);
+        float detailOffsetY = Random.Range(0f, 1000f);
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int i = y * width + x;
+                
+                float continentNoise = Mathf.PerlinNoise((float)x / width * continentalFrequency + continentalOffsetX, (float)y / height * continentalFrequency + continentalOffsetY);
 
-                float sample = Mathf.PerlinNoise(x * scale + offsetX, y *  scale + offsetY);
+                bool isWater = continentNoise < waterThreshold;
 
-                if (sample < 0.3f)
+                if (isWater)
                 {
                     tiles[i].tileType = TileType.Water;
-                }            
-                else if (sample < 0.4f)
-                {
-                    tiles[i].tileType = TileType.Sand;
-                }      
-                else if (sample < 0.8f)
-                {
-                    tiles[i].tileType = TileType.Grass;
+                    tiles[i].elevation = 0f;
+                    tiles[i].foodAmount = 0f;
                 }
                 else
                 {
-                    tiles[i].tileType = TileType.Stone;
+                    float mountainNoise = Mathf.PerlinNoise((float)x / width * mountainFrequency + mountainOffsetX, (float)y / height * mountainFrequency + mountainOffsetY);
+
+                    tiles[i].elevation = mountainNoise;
+                    
+                    float moistureNoise = Mathf.PerlinNoise((float)x / width * moistureFrequency + moistureOffsetX, (float)y / height * moistureFrequency + moistureOffsetY);
+                    
+                    float detailNoise = Mathf.PerlinNoise((float)x / width * detailFrequency + detailOffsetX, (float)y / height * detailFrequency + detailOffsetY);
+                    
+                    if (mountainNoise > mountainThreshold)
+                    {
+                        tiles[i].tileType = TileType.Stone;
+                        tiles[i].foodAmount = 0f;
+                    }
+                    else if (moistureNoise < 0.3f + detailNoise * 0.1f)
+                    {
+                        tiles[i].tileType = TileType.Sand;
+                        tiles[i].foodAmount = 0.2f;
+                    }
+                    else if (moistureNoise > 0.6f - detailNoise * 0.1f && detailNoise > 0.5f)
+                    {
+                        tiles[i].tileType = TileType.Grass;
+                        tiles[i].foodAmount = 2f;
+                    }
+                    else
+                    {
+                        tiles[i].tileType = TileType.Grass;
+                        tiles[i].foodAmount = 1f;
+                    }
                 }
 
-                switch (tiles[i].tileType)
-                {
-                    case TileType.Grass: tiles[i].foodAmount = 1f; break;
-                    case TileType.Sand: tiles[i].foodAmount = 0.2f; break;
-                    case TileType.Stone: tiles[i].foodAmount = 0f; break;
-                    case TileType.Water: tiles[i].foodAmount = 0f; break;
-                }
-                
                 tiles[i].factionId = -1;
 
+                //for (int f = 0; f < factionManager.FactionCount; f++)
+                //{
+                //    FactionData fd = factionManager.GetFaction(f);
+                
+                //    if (fd == null) continue;
+                //
+                //    int hexSize = 16;
+                //    int startTileX = x;
+                //    int startTileY = y;
+                
+                //    if (x >= startTileX && x < startTileX + hexSize && y >= startTileY && y < startTileY + hexSize && tiles[i].tileType != TileType.Water && tiles[i].factionId == -1)
+                //    {
+                //        tiles[i].factionId = f;
+                
+                //        break;
+                //    }
+                //}
+                
+                float riverNoise = Mathf.PerlinNoise((float)x / width * 0.15f + detailOffsetX, (float)y / height * 0.15f + detailOffsetY);
+
+                if (!isWater && riverNoise > 0.49f && riverNoise < 0.5f)
+                {
+                    tiles[i].tileType = TileType.Water;
+                    tiles[i].foodAmount = 0f;
+                }
+                
                 for (int f = 0; f < factionManager.FactionCount; f++)
                 {
                     FactionData fd = factionManager.GetFaction(f);
-
+            
                     if (fd == null) continue;
-                    
-                    if (f % 2 == 0 && x < width / 3 && y < height / 3 && IsPassable(x, y)) tiles[i].factionId = f; else if (f % 2 == 1 && x > 2 * width / 3 && y > 2 * height / 3 && IsPassable(x, y)) tiles[i].factionId = f;
+            
+                    int hexSize = 16;
+                    int startTileX = fd.startingHex.x * hexSize;
+                    int startTileY = fd.startingHex.y * hexSize;
+            
+                    if (x >= startTileX && x < startTileX + hexSize && y >= startTileY && y < startTileY + hexSize && tiles[i].tileType != TileType.Water)
+                    {
+                        tiles[i].factionId = f;
+            
+                        break;
+                    }
                 }
 
                 tiles[i].unitsByFaction = new int[maxFactions];
+
+                tiles[i].buildings = new List<BuildingData>();
             }
         }
+    }
 
-        UpdateTileOwnership();
+    public void AddBuildingCount(int factionId, BuildingType type)
+    {
+        if (factionId >= 0 && factionId < buildingCounts.GetLength(0)) buildingCounts[factionId, (int)type]++;
+    }
+
+    public int GetBuildingCount(int factionId, BuildingType type)
+    {
+        if (factionId >= 0 && factionId < buildingCounts.GetLength(0)) return buildingCounts[factionId, (int)type];
+        
+        return 0;
     }
 
     public Vector2Int? FindNearestEnemyTile(Vector2 fromPosition, int selfFaction, float searchRadius, int targetFaction = -2)
@@ -113,7 +193,7 @@ public class TileManager : MonoBehaviour
             {
                 TileData tile = GetTile(x, y);
 
-                if ((!anyTarget && tile.factionId == targetFaction || anyTarget && tile.factionId != selfFaction) && IsPassable(x, y))
+                if ((!anyTarget && tile.factionId == targetFaction || anyTarget && tile.factionId != selfFaction) && IsPassable(x, y) && tile.tileType != TileType.Water)
                 {
                     float dist = Vector2.Distance(fromPosition, new Vector2(x * tileSize + tileSize / 2f, y * tileSize + tileSize / 2f));
 
@@ -152,7 +232,7 @@ public class TileManager : MonoBehaviour
 
             int index = tilePos.y * width + tilePos.x;
 
-            if (index < 0 || index >= tiles.Length || !IsPassable(tilePos.x, tilePos.y)) continue;
+            if (index < 0 || index >= tiles.Length || !IsPassable(tilePos.x, tilePos.y) || tiles[index].tileType == TileType.Water) continue;
 
             int factionId = humans[i].factionId;
 

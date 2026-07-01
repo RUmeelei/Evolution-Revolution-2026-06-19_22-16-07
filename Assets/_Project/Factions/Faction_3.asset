@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358ba2bc4d4fdff48827fe4f1950ebff, type: 3}
+  m_Name: Faction_3
+  m_EditorClassIdentifier: Assembly-CSharp::FactionData
+  factionId: 3
+  factionName: "\u041A\u0435\u043D\u0438\u044F"
+  rulerName: "\u0416\u0435\u043D\u044F \u041F\u0440\u0438\u0433\u043E\u0436\u0438\u043D"
+  startingHex: {x: 5, y: 3}
+  factionColor: {r: 0.3018868, g: 0.0071199704, b: 0.0071199704, a: 1}
+  startingFood: 250
+  startingUnits: 5
+  rulerCharacter: 1
+  isPlayer: 0
+  unitSprite: {fileID: 2269961892177271623, guid: 6eb76dbef940ab64aa0d40c879f89e74, type: 3}
+  selectionColor: {r: 0, g: 1, b: 0, a: 1}

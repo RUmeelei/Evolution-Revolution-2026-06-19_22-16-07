@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 public class SelectionManager : MonoBehaviour
@@ -12,9 +13,13 @@ public class SelectionManager : MonoBehaviour
 
     private List<int> selectedUnits = new List<int>();
 
+    public List<int> SelectedUnits => selectedUnits;
+
     private UnitManager unitManager;
 
     private Vector2Int? lastClickedTile = null;
+
+    public Vector2Int? LastClickedTile => lastClickedTile;
 
     void Awake()
     {
@@ -27,7 +32,7 @@ public class SelectionManager : MonoBehaviour
     {
         TileManager tm = FindFirstObjectByType<TileManager>();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             startMousePos = Input.mousePosition;
         }
@@ -39,7 +44,7 @@ public class SelectionManager : MonoBehaviour
 
             Vector2 p3 = p1 - p2;
 
-            if (p3.sqrMagnitude > 200)
+            if (p3.sqrMagnitude > 200 && !EventSystem.current.IsPointerOverGameObject())
             {
                 isDragging = true;
             }
@@ -49,7 +54,7 @@ public class SelectionManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             if (isDragging)
             {
@@ -95,13 +100,16 @@ public class SelectionManager : MonoBehaviour
                 if (!clickedOnUnit && selectedUnits.Count > 0)
                 {
                     selectedUnits.Clear();
-                    lastClickedTile = null;
                 }
+
+                lastClickedTile = null;
             
                 Vector2 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
 
                 if (tm != null)
                 {
+                    if (clickedOnUnit) return;
+
                     if (worldPos.x >= 0 && worldPos.x < tm.width * tm.tileSize && worldPos.y >= 0 && worldPos.y < tm.height * tm.tileSize)
                     {
                         lastClickedTile = tm.WorldToTile(worldPos);
@@ -113,8 +121,12 @@ public class SelectionManager : MonoBehaviour
                 }
             }
         }
+        else if (EventSystem.current.IsPointerOverGameObject())
+        {
+            isDragging = false;
+        }
 
-        if (Input.GetMouseButtonDown(1) && selectedUnits.Count > 0)
+        if (Input.GetMouseButtonDown(1) && selectedUnits.Count > 0 && !EventSystem.current.IsPointerOverGameObject())
         {
             Vector3 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
             worldPos.z = 0;

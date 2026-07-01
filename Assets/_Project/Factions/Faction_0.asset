@@ -15,10 +15,11 @@ MonoBehaviour:
   factionId: 0
   factionName: "\u0423\u043A\u0440\u0430\u0438\u043D\u0430"
   rulerName: "\u0417\u0435\u043B\u0435\u043D\u0441\u043A\u0438\u0439"
+  startingHex: {x: 1, y: 1}
   factionColor: {r: 0, g: 0.27323264, b: 0.6666667, a: 1}
   startingFood: 250
   startingUnits: 5
-  rulerCharacter: 4
+  rulerCharacter: 1
   isPlayer: 0
   unitSprite: {fileID: 2269961892177271623, guid: 6eb76dbef940ab64aa0d40c879f89e74, type: 3}
   selectionColor: {r: 0, g: 1, b: 0, a: 1}

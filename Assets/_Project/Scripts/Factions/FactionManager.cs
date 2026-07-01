@@ -7,11 +7,6 @@ public class FactionManager : MonoBehaviour
     public void Initialize()
     {
         System.Array.Sort(factions, (a, b) => a.factionId.CompareTo(b.factionId));
-
-        for (int i = 0; i < factions.Length; i++)
-        {
-            Debug.Log($"Faction {factions[i].factionName} color : {factions[i].factionColor}");
-        }
     }
 
     public FactionData GetFaction(int factionId)

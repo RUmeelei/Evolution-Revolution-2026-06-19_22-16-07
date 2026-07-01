@@ -12,32 +12,40 @@ public class UnitManager : MonoBehaviour
     private TileManager tileManager;
     private UnitVisualManager unitVisualManager;
     private FactionManager factionManager;
+    private SelectionManager selectionManager;
+    private PoliticsManager politicsManager;
+
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip selectSound;
+    [SerializeField] private AudioClip moveSound;
 
     public void Initialize(int maxHumans)
     {
         humans = new HumanData[maxHumans];
 
-        Debug.Log($"Initialized UnitManager with capacity for {maxHumans} humans.");
-
         if (unitVisualManager == null) unitVisualManager = FindFirstObjectByType<UnitVisualManager>();
 
         if (factionManager == null) factionManager = FindFirstObjectByType<FactionManager>();
+
+        if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
+
+        if (politicsManager == null) politicsManager = FindFirstObjectByType<PoliticsManager>();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            for (int i = 0; i < humans.Length; i++)
-            {
-                CreateHuman(new Vector2 (Random.Range(5f, 10f), Random.Range(5f, 10f)));
-            } 
-        }
+        // if (Input.GetKeyDown(KeyCode.B))
+        // {
+        //     for (int i = 0; i < humans.Length; i++)
+        //     {
+        //         CreateHuman(new Vector2 (Random.Range(5f, 10f), Random.Range(5f, 10f)));
+        //     } 
+        // }
 
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            RandomMoveUnit(GetRandomUnitIndex());
-        }
+        // if (Input.GetKeyDown(KeyCode.V))
+        // {
+        //     RandomMoveUnit(GetRandomUnitIndex());
+        // }
     }
 
     public void SpawnHuman(Vector2 pos, int faction)
@@ -104,6 +112,8 @@ public class UnitManager : MonoBehaviour
         {
             humans[index].targetPosition = pos;
 
+            AudioManager.Instance?.PlayClipAtPosition(moveSound, humans[index].position);
+
             if (!humans[index].isExhausted)
             {
                 humans[index].hasTarget = true;
@@ -144,12 +154,21 @@ public class UnitManager : MonoBehaviour
     {
         List<int> result = new List<int>();
 
+        Vector2 sPos = Vector2.zero;
+
         for (int i = 0; i < humans.Length; i++)
         {
             if (!humans[i].isAlive) continue;
 
-            if (worldRect.Contains(humans[i].position) && factionManager.IsPlayerFaction(humans[i].factionId)) result.Add(i);
+            if (worldRect.Contains(humans[i].position) && factionManager.IsPlayerFaction(humans[i].factionId))
+            {
+                result.Add(i);
+
+                if (sPos == Vector2.zero) sPos = humans[i].position;
+            } 
         }
+
+        AudioManager.Instance?.PlayClipAtPosition(selectSound, sPos);
 
         return result;
     }
@@ -158,7 +177,7 @@ public class UnitManager : MonoBehaviour
     {
         List<int> result = new List<int>();
 
-        float pickRadius = 0.1f;
+        float pickRadius = 0.25f;
 
         if (unitVisualManager != null) pickRadius = unitVisualManager.SpriteRadius;
 
@@ -166,7 +185,12 @@ public class UnitManager : MonoBehaviour
         {
             if (!humans[i].isAlive) continue;
 
-            if ((humans[i].position == pos || Vector2.Distance(humans[i].position, pos) < pickRadius) && factionManager.IsPlayerFaction(humans[i].factionId)) result.Add(i);
+            if ((humans[i].position == pos || Vector2.Distance(humans[i].position, pos) < pickRadius) && factionManager.IsPlayerFaction(humans[i].factionId))
+            {
+                result.Add(i);
+
+                AudioManager.Instance?.PlayClipAtPosition(selectSound, humans[i].position);
+            } 
         }
 
         return result;
@@ -191,20 +215,57 @@ public class UnitManager : MonoBehaviour
         {
             humans[index].isAlive = false;
             aliveCount--;
+
+            if (selectionManager != null && selectionManager.IsSelected(index)) selectionManager.SelectedUnits.Remove(index);
         }
     }
 
-    public bool IsPositionBlocked(Vector2 pos, int selfidx, float radius)
+    public bool IsPositionBlocked(Vector2 pos, int selfIdx, float radius)
     {
-        for (int j = 0; j < humans.Length; j++)
+        if (tileManager == null) return false;
+
+        Vector2Int centerTile = tileManager.WorldToTile(pos);
+
+        int checkRadius = Mathf.CeilToInt(radius / tileManager.tileSize) + 1;
+
+        for (int dy = -checkRadius; dy <= checkRadius; dy++)
         {
-            if (j == selfidx) continue;
+            for (int dx = -checkRadius; dx <= checkRadius; dx++)
+            {
+                int tx = centerTile.x + dx;
+                int ty = centerTile.y + dy;
 
-            if (!humans[j].isAlive) continue;
+                if (tx < 0 || tx >= tileManager.width || ty < 0 || ty >= tileManager.height) continue;
 
-            if (Vector2.Distance(pos, humans[j].position) < radius) return true;
+                TileData tile = tileManager.GetTile(tx, ty);
+
+                if (tile.unitsByFaction == null) continue;
+                
+                bool hasUnits = false;
+
+                for (int f = 0; f < tile.unitsByFaction.Length; f++)
+                {
+                    if (tile.unitsByFaction[f] > 0) { hasUnits = true; break; }
+                }
+
+                if (!hasUnits) continue;
+                
+                for (int j = 0; j < humans.Length; j++)
+                {
+                    if (j == selfIdx) continue;
+
+                    if (!humans[j].isAlive) continue;
+
+                    Vector2Int unitTile = tileManager.WorldToTile(humans[j].position);
+
+                    if (unitTile.x == tx && unitTile.y == ty)
+                    {
+                        if (Vector2.Distance(pos, humans[j].position) < radius) return true;
+                    }
+                }
+            }
         }
-
+        
         return false;
     }
 
@@ -256,7 +317,9 @@ public class UnitManager : MonoBehaviour
 
                     human.attackTimer = human.attackCooldown;
 
-                    Debug.Log($"Unit {i} (faction {human.factionId}) attacks unit {enemyIndex} (faction {humans[enemyIndex].factionId}) for {human.attackDamage} damage. HP left: {humans[enemyIndex].hp}");
+                    unitVisualManager?.TriggerDamageFlash(enemyIndex);
+
+                    AudioManager.Instance?.PlayClipAtPosition(attackSound, humans[enemyIndex].position);
                 }
             }
 

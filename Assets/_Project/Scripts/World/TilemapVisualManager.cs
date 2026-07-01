@@ -19,8 +19,13 @@ public class TilemapVisualManager : MonoBehaviour
     [Header("Regions")]
     [SerializeField] private float regionThreshold = 35f;
 
+    [Header("Map Modes")]
+    [SerializeField] private int mapMode = 0;
+
     private RegionManager regionManager;
     private FactionManager factionManager;
+    private SelectionManager selectionManager;
+    private DiplomacyManager diplomacyManager;
 
     public void Initialize(TileManager manager)
     {
@@ -31,6 +36,10 @@ public class TilemapVisualManager : MonoBehaviour
         if (baseTilemap == null) baseTilemap = GetComponent<Tilemap>();
 
         SimulationManager sm = FindFirstObjectByType<SimulationManager>();
+
+        selectionManager = FindFirstObjectByType<SelectionManager>();
+
+        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
 
         regionManager = sm?.RegionManager; 
 
@@ -44,6 +53,15 @@ public class TilemapVisualManager : MonoBehaviour
     void Update()
     {
         RedrawVisibleTiles();
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (mapMode < 2)
+            {
+                mapMode++;
+            }
+            else mapMode = 0;
+        }
     }
 
     public void RedrawAllTiles()
@@ -89,13 +107,15 @@ public class TilemapVisualManager : MonoBehaviour
 
         Vector3Int tilePos = new Vector3Int(x, y, 0);
 
-        TileBase tileBase;
+        TileBase tileBase = grassTile;
 
-        Color color;
+        Color color = Color.gray;
 
-        bool isRegionMode = cam.orthographicSize >= regionThreshold && regionManager != null;
+        bool isRegionMode = cam.orthographicSize >= regionThreshold && regionManager != null || mapMode == 1;
 
-        if (isRegionMode && tileManager.IsWorldPassable(new Vector2(tilePos.x, tilePos.y)))
+        bool isDiplomaticMode = mapMode == 2;
+
+        if ((isRegionMode || isDiplomaticMode && (selectionManager == null || selectionManager.GetLastClickedTile() == null || tileManager.GetTile(selectionManager.GetLastClickedTile().Value.x, selectionManager.GetLastClickedTile().Value.y).factionId == -1)) && tileManager.IsWorldPassable(new Vector2(tilePos.x, tilePos.y)) && tile.tileType != TileType.Water)
         {
             RegionData? region = regionManager.GetRegion(x, y, tileManager);
 
@@ -115,6 +135,47 @@ public class TilemapVisualManager : MonoBehaviour
                 Color factionColor = factionManager?.GetFaction(fid)?.factionColor ?? Color.gray;
 
                 color = factionColor;
+            }
+            else
+            {
+                color = Color.gray;
+            }
+
+            tileBase = isBorder ? borderTile : regionTile;
+        }
+        else if (isDiplomaticMode && selectionManager != null && tile.tileType != TileType.Water)
+        {
+            Vector2Int? selectedTile = selectionManager.GetLastClickedTile();
+
+            int selectedId = tileManager.GetTile(selectedTile.Value.x, selectedTile.Value.y).factionId;
+
+            bool isBorder = false;
+
+            int currentId = tile.regionId;
+
+            if (x > 0 && tileManager.GetTile(x-1, y).regionId != currentId) isBorder = true;
+            else if (x < tileManager.width-1 && tileManager.GetTile(x+1, y).regionId != currentId) isBorder = true;
+            else if (y > 0 && tileManager.GetTile(x, y-1).regionId != currentId) isBorder = true;
+            else if (y < tileManager.height-1 && tileManager.GetTile(x, y+1).regionId != currentId) isBorder = true;
+
+            if (tile.factionId == selectedId)
+            {
+                color = Color.cyan;
+            }
+            else if (tile.factionId != -1)
+            {
+                for (int f = 0; f < factionManager.FactionCount; f++)
+                {
+                    if (f == selectedId) continue;
+                    
+                    if (tile.factionId != f) continue;
+
+                    bool atWar = diplomacyManager.GetRelations(selectedId, f).atWar;
+
+                    color = atWar ? Color.softRed : Color.green;
+
+                    break;
+                }
             }
             else
             {

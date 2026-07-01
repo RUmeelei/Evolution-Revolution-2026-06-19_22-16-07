@@ -10,6 +10,8 @@ public class WinConditionManager : MonoBehaviour
 
     public event Action<int> OnVictory; // с параметром int
 
+    private List<TileData> waterTiles = new List<TileData>();
+
     public void Initialize()
     {
         SimulationManager sm = FindFirstObjectByType<SimulationManager>();
@@ -29,13 +31,20 @@ public class WinConditionManager : MonoBehaviour
 
         Dictionary<int, int> factionTileCount = new Dictionary<int, int>();
 
+        waterTiles.Clear();
+
         for (int i = 0; i < totalTiles; i++)
         {
+            if (tm.Tiles[i].tileType == TileType.Water) waterTiles.Add(tm.Tiles[i]);
+
             int fid = tm.Tiles[i].factionId;
 
-            if (!factionTileCount.ContainsKey(fid)) factionTileCount[fid] = 0;
+            if (!factionTileCount.ContainsKey(fid)) factionTileCount[fid] = 0; factionTileCount[fid]++;
+        }
 
-            factionTileCount[fid]++;
+        for (int i = 0; i < waterTiles.Count; i++)
+        {
+            totalTiles--;
         }
 
         int maxFaction = -1;
@@ -59,8 +68,6 @@ public class WinConditionManager : MonoBehaviour
             FactionManager fm = FindFirstObjectByType<FactionManager>();
 
             string factionName = fm?.GetFaction(maxFaction)?.factionName ?? maxFaction.ToString();
-
-            Debug.Log($"ФРАКЦИЯ {factionName} ПОБЕДИЛА! Контролирует {maxTiles} из {totalTiles} тайлов.");
 
             SimulationManager sm = FindFirstObjectByType<SimulationManager>();
 

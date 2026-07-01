@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -10,9 +11,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Time Controls")]
     [SerializeField] private Button pauseButton;
-    [SerializeField] private Button playButton;
-    [SerializeField] private Button speed1xButton;
-    [SerializeField] private Button speed2xButton;
+    [SerializeField] private Image pauseImage;
+    [SerializeField] private Button speedIncreaseButton;
+    [SerializeField] private Button speedDecreaseButton;
+    [SerializeField] private Sprite pauseIcon;
+    [SerializeField] private Sprite playIcon;
+    [SerializeField] private Image[] speedBars;
+    [SerializeField] private Color activeSpeedColor = Color.green;
+    [SerializeField] private Color inactiveSpeedColor = Color.gray;
 
     [Header("Selection Info")]
     [SerializeField] private GameObject selectionPanel;
@@ -23,6 +29,26 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI victoryText;
     [SerializeField] private Button mainMenuButton;
 
+    [Header("Politics Panel")]
+    [SerializeField] private GameObject politicsPanel;
+    [SerializeField] private TextMeshProUGUI politicsText;
+
+    [Header("Diplomacy Panel")]
+    [SerializeField] private GameObject diplomacyPanel;
+    [SerializeField] private TextMeshProUGUI diplomacyStatusText;
+    [SerializeField] private Button declareWarButton;
+    [SerializeField] private Button offerPeaceButton;
+    [SerializeField] private Button closeDiplomacyButton;
+
+    [Header("Tutorial Panel")]
+    [SerializeField] private GameObject tutorialPanel;
+
+    private bool tutorialPassed = false;
+
+    private int selectedDiplomacyFaction = 0;
+
+    private DiplomacyManager diplomacyManager;
+    private PoliticsManager politicsManager;
     private SelectionManager selectionManager;
     private UnitManager unitManager;
     private EconomyManager economyManager;
@@ -44,13 +70,21 @@ public class UIManager : MonoBehaviour
 
         unitManager = FindFirstObjectByType<UnitManager>();
         
+        politicsManager = FindFirstObjectByType<PoliticsManager>();
+
+        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+
+        if (declareWarButton != null) declareWarButton.onClick.AddListener(OnDeclareWar);
+
+        if (offerPeaceButton != null) offerPeaceButton.onClick.AddListener(OnOfferPeace);
+
+        if (closeDiplomacyButton != null) closeDiplomacyButton.onClick.AddListener(OnCloseDiplomacy);
+        
         if (pauseButton != null) pauseButton.onClick.AddListener(OnPause);
 
-        if (playButton != null) playButton.onClick.AddListener(OnPlay);
+        if (speedIncreaseButton != null) speedIncreaseButton.onClick.AddListener(OnSpeedIncrease);
 
-        if (speed1xButton != null) speed1xButton.onClick.AddListener(OnSpeed1x);
-
-        if (speed2xButton != null) speed2xButton.onClick.AddListener(OnSpeed2x);
+        if (speedDecreaseButton != null) speedDecreaseButton.onClick.AddListener(OnSpeedDecrease);
 
         WinConditionManager wcm = FindFirstObjectByType<WinConditionManager>();
 
@@ -59,6 +93,23 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.V) && diplomacyPanel != null)
+        {
+            diplomacyPanel.SetActive(!diplomacyPanel.activeSelf);
+        }
+        
+        if (pauseImage != null && simulationManager != null) pauseImage.sprite = simulationManager.Running ? playIcon : pauseIcon;
+            
+        if (speedBars != null && simulationManager != null)
+        {
+            int currentSpeed = simulationManager.SimulationSpeed;
+
+            for (int i = 0; i < speedBars.Length; i++)
+            {
+                if (speedBars[i] != null) speedBars[i].color = (i < currentSpeed) ? activeSpeedColor : inactiveSpeedColor;
+            }
+        }
+
         if (economyManager != null && factionManager != null && foodValue != null)
         {
             for (int i = 0; i < factionManager.FactionCount; i++)
@@ -69,6 +120,65 @@ public class UIManager : MonoBehaviour
 
                     break;
                 }
+            }
+        }
+        
+        if (politicsManager != null && factionManager != null && politicsText != null)
+        {
+            for (int i = 0; i < factionManager.FactionCount; i++)
+            {
+                if (factionManager.IsPlayerFaction(i))
+                {
+                    var groups = politicsManager.GetFactionGroups(i);
+
+                    if (groups != null)
+                    {
+                        string display = "";
+                        string[] groupNames = { "Элита", "Произв.", "Торговцы", "Идеологи", "Военные" };
+
+                        for (int g = 0; g < groups.Length; g++)
+                        {
+                            display += $"{groupNames[g]}: {groups[g].loyalty:F0}%\n";
+                        }
+                        politicsText.text = display.TrimEnd('\n');
+                        politicsPanel.SetActive(true);
+                    }
+                    else
+                    {
+                        politicsText.text = "";
+                        politicsPanel.SetActive(false);
+                    }
+
+                    break;
+                }
+            }
+        }
+        
+        if (diplomacyPanel != null && diplomacyPanel.activeSelf && diplomacyManager != null && factionManager != null)
+        {
+            int playerFaction = GetPlayerFaction();
+
+            Vector2Int? selectedTile = selectionManager.GetLastClickedTile();
+
+            int selectedId = (selectedTile != null && tileManager.GetTile(selectedTile.Value.x, selectedTile.Value.y).factionId != -1) ? tileManager.GetTile(selectedTile.Value.x, selectedTile.Value.y).factionId : -1;
+
+            selectedDiplomacyFaction = selectedId;
+
+            FactionData selectedFaction = factionManager.GetFaction(selectedId);
+
+            string selectedFactionName = (selectedTile != null && selectedId != -1) ? selectedFaction.factionName : "Нейтральные";
+
+            var rel = (selectedTile != null && selectedId != -1) ? diplomacyManager.GetRelations(playerFaction, selectedDiplomacyFaction) : null;
+
+            string status = rel != null ? rel.atWar ? "Война" : "Мир" : "Нейтралитет";
+
+            if (selectedDiplomacyFaction != -1)
+            {
+                diplomacyStatusText.text = $"Фракция: {selectedFactionName}\nСтатус: {status}\nНапряжение: {rel.tension:F0}%";
+            }
+            else
+            {
+                diplomacyStatusText.text = $"Фракция: {selectedFactionName}\nСтатус: {status}\nНапряжение: 0%";
             }
         }
         
@@ -105,6 +215,13 @@ public class UIManager : MonoBehaviour
                 selectionPanel.SetActive(false);
             }
         }
+
+        if (simulationManager.Running && !tutorialPassed)
+        {
+            tutorialPanel.SetActive(false);
+            
+            tutorialPassed = true;
+        }
     }
 
     private void ShowVictoryScreen(int winnerFactionId)
@@ -130,21 +247,49 @@ public class UIManager : MonoBehaviour
 
     void OnPause()
     {
-        if (simulationManager != null) simulationManager.PauseSimulation();
+        if (simulationManager != null) if (simulationManager.Running) simulationManager.PauseSimulation(); else simulationManager.ResumeSimulation();
     }
 
-    void OnPlay()
+    void OnSpeedIncrease()
     {
-        if (simulationManager != null) simulationManager.ResumeSimulation();
+        if (simulationManager != null) simulationManager.IncreaseSimulationSpeed();
     }
 
-    void OnSpeed1x()
+    void OnSpeedDecrease()
     {
-        if (simulationManager != null) simulationManager.SetSimulationSpeed(1);
+        if (simulationManager != null) simulationManager.DecreaseSimulationSpeed();
     }
 
-    void OnSpeed2x()
+    void OnDeclareWar()
     {
-        if (simulationManager != null) simulationManager.SetSimulationSpeed(2);
+        if (diplomacyManager == null || factionManager == null || selectedDiplomacyFaction == -1) return;
+
+        int playerFaction = GetPlayerFaction();
+
+        diplomacyManager.DeclareWar(playerFaction, selectedDiplomacyFaction);
+    }
+
+    void OnOfferPeace()
+    {
+        if (diplomacyManager == null || factionManager == null || selectedDiplomacyFaction == -1) return;
+
+        int playerFaction = GetPlayerFaction();
+
+        diplomacyManager.MakePeace(playerFaction, selectedDiplomacyFaction);
+    }
+
+    void OnCloseDiplomacy()
+    {
+        if (diplomacyPanel != null) diplomacyPanel.SetActive(false);
+    }
+
+    int GetPlayerFaction()
+    {
+        for (int i = 0; i < factionManager.FactionCount; i++)
+        {
+            if (factionManager.IsPlayerFaction(i)) return i;
+        }
+
+        return 0;
     }
 }

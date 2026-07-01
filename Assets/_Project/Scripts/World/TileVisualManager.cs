@@ -23,6 +23,7 @@ public class TileVisualManager : MonoBehaviour
     private SimulationManager simulationManager;
     private CameraManager cameraManager;
     private RegionManager regionManager;
+    private SelectionManager selectionManager;
 
     public void Initialize(TileManager manager)
     {
@@ -31,6 +32,8 @@ public class TileVisualManager : MonoBehaviour
         if (tileManager == null) tileManager = FindFirstObjectByType<TileManager>();
 
         if (cameraManager == null) cameraManager = FindFirstObjectByType<CameraManager>();
+
+        if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
 
         SimulationManager sm = FindFirstObjectByType<SimulationManager>();
         regionManager = sm?.RegionManager;
@@ -62,7 +65,6 @@ public class TileVisualManager : MonoBehaviour
     {
         if (tileManager == null)
         {
-            Debug.Log("TileVisualManager: No TileManager found.");
             return;
         }
 
@@ -70,7 +72,6 @@ public class TileVisualManager : MonoBehaviour
 
         if (tiles == null) 
         {
-            Debug.Log("TileVisualManager: No tiles found in TileManager.");
             return;
         }
 
