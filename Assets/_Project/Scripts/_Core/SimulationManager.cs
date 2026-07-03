@@ -54,49 +54,6 @@ public class SimulationManager : MonoBehaviour
 
     void Awake()
     {
-        factionManager = GameManager.FactionManager;
-        factionManager.Initialize();
-
-        tileManager = GameManager.TileManager;
-        tileManager.Initialize();
-        
-        regionManager = new RegionManager();
-        regionManager.Initialize(factionManager.FactionCount);
-        regionManager.GenerateNeutralRegions(tileManager);
-        
-        factionManager.AssignFactionsToRegions(regionManager, tileManager);
-        
-        tileVisualManager = GameManager.TilemapVisualManager;
-        tileVisualManager.Initialize(tileManager);
-        tileVisualManager.RedrawAllTiles();
-        
-        unitManager = GameManager.UnitManager;
-
-        unitVisualManager = GameManager.UnitVisualManager;
-
-        unitManager.Initialize(1000);
-
-        unitVisualManager.Initialize(unitManager);
-        
-        economyManager = GameManager.EconomyManager;
-        economyManager.Initialize();
-        
-        aiManager = GameManager.AIManager;
-        aiManager.Initialize();
-        
-        spawnManager = GameManager.SpawnManager;
-        spawnManager.Initialize();
-        // spawnManager.SpawnStartingUnits();
-        
-        winConditionManager = GameManager.WinConditionManager;
-        winConditionManager.Initialize();
-
-        politicsManager = GameManager.PoliticsManager;
-        politicsManager.Initialize();
-
-        diplomacyManager = GameManager.DiplomacyManager;
-        diplomacyManager.Initialize();
-
         GameManager.RegisterSimulationManager(this);
     }
     
@@ -138,11 +95,8 @@ public class SimulationManager : MonoBehaviour
 
         LastTickTime = Time.time;
 
-        if (unitManager == null)
-        {
-            unitManager = GameManager.UnitManager;
-        }
-
+        if (unitManager == null) unitManager = GameManager.UnitManager;
+            
         unitManager.Tick(delta);
     }
     private void ProcessSlowTick(float delta)
@@ -153,47 +107,29 @@ public class SimulationManager : MonoBehaviour
         {
             OnSlowTick?.Invoke(delta);
 
-            if (unitManager == null)
-            {
-                unitManager = GameManager.UnitManager;
-            }
+            if (unitManager == null) unitManager = GameManager.UnitManager;
 
-            if (economyManager == null)
-            {
-                economyManager = GameManager.EconomyManager;
-            }
+            if (economyManager == null) economyManager = GameManager.EconomyManager;
+
+            if (aiManager == null) aiManager = GameManager.AIManager;
+
+            if (tileManager == null) tileManager = GameManager.TileManager;
+
+            if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
+
+            if (diplomacyManager == null) diplomacyManager = GameManager.DiplomacyManager;
+            
+            if (regionManager == null) regionManager = GameManager.RegionManager;
 
             economyManager.ProcessEconomy(delta);
 
-            if (aiManager == null)
-            {
-                aiManager = GameManager.AIManager;
-            }
-
             aiManager.ProcessAI(delta);
-
-            // if (unitManager.Humans.Length > 0) unitManager.RandomMoveUnit(unitManager.GetRandomUnitIndex());
-
-            if (tileManager == null)
-            {
-                tileManager = GameManager.TileManager;
-            }
 
             tileManager.UpdateTileOwnership();
 
             regionManager.UpdateRegions(tileManager);
 
-            if (politicsManager == null)
-            {
-                politicsManager = GameManager.PoliticsManager;
-            }
-
             politicsManager.UpdatePolitics(delta);
-
-            if (diplomacyManager == null)
-            {
-                diplomacyManager = GameManager.DiplomacyManager;
-            }
 
             diplomacyManager.CleanupEvents(tickCounter);
 
@@ -208,17 +144,11 @@ public class SimulationManager : MonoBehaviour
         {
             OnEpicTick?.Invoke(delta);
 
-            if (winConditionManager == null)
-            {
-                winConditionManager = GameManager.WinConditionManager;
-            }
+            if (winConditionManager == null) winConditionManager = GameManager.WinConditionManager;
             
             winConditionManager.CheckVictory();
 
-            if (politicsManager == null)
-            {
-                politicsManager = GameManager.PoliticsManager;
-            }
+            if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
 
             politicsManager.ProcessConstruction();
 

@@ -8,7 +8,7 @@ public class WinConditionManager : MonoBehaviour
 
     private bool gameEnded = false;
 
-    public event Action<int> OnVictory; // с параметром int
+    public event Action<int> OnVictory;
 
     private List<TileData> waterTiles = new List<TileData>();
 
@@ -21,7 +21,7 @@ public class WinConditionManager : MonoBehaviour
     {
         SimulationManager sm = GameManager.SimulationManager;
 
-        regionManager = sm?.RegionManager;
+        regionManager = GameManager.RegionManager;
     }
 
     public void CheckVictory()

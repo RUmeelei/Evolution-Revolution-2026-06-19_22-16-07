@@ -13,7 +13,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("Zoom-based Volume")]
     [SerializeField] private float minZoom = 2f;
-    [SerializeField] private float maxZoom = 50f;
+    [SerializeField] private float maxZoom = 20f;
     [SerializeField] private Camera mainCamera;
 
     [Header("Music")]

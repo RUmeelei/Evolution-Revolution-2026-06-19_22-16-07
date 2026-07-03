@@ -55,4 +55,45 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
     }
+    
+    void Start()
+    {
+        InitializeManagers();
+    }
+
+    private void InitializeManagers()
+    {
+        FactionManager.Initialize();
+        
+        TileManager.Initialize();
+        
+        RegionManager = new RegionManager();
+        RegionManager.Initialize(FactionManager.FactionCount);
+        RegionManager.GenerateNeutralRegions(TileManager);
+        RegisterRegionManager(RegionManager);
+        
+        FactionManager.AssignFactionsToRegions(RegionManager, TileManager);
+        
+        TilemapVisualManager.Initialize(TileManager);
+        TilemapVisualManager.RedrawAllTiles();
+        
+        UnitManager.Initialize(1000);
+        
+        UnitVisualManager.Initialize(UnitManager);
+        
+        EconomyManager.Initialize();
+        
+        AIManager.Initialize();
+        
+        SpawnManager.Initialize();
+        // SpawnManager.SpawnStartingUnits();
+        
+        WinConditionManager.Initialize();
+        
+        PoliticsManager.Initialize();
+        
+        DiplomacyManager.Initialize();
+
+        Debug.Log("Все менеджеры инициализированы.");
+    }
 }

@@ -36,7 +36,7 @@ public class TileVisualManager : MonoBehaviour
         if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
 
         SimulationManager sm = GameManager.SimulationManager;
-        regionManager = sm?.RegionManager;
+        regionManager = GameManager.RegionManager;
 
         int visibleTilesX = Mathf.CeilToInt(2f * cameraManager.MaxZoom * cam.aspect / tileManager.tileSize);
         int visibleTilesY = Mathf.CeilToInt(2f * cameraManager.MaxZoom / tileManager.tileSize);

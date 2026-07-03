@@ -47,13 +47,11 @@ public class TilemapVisualManager : MonoBehaviour
 
         if (baseTilemap == null) baseTilemap = GetComponent<Tilemap>();
 
-        SimulationManager sm = GameManager.SimulationManager;
-
         selectionManager = FindFirstObjectByType<SelectionManager>();
 
         diplomacyManager = GameManager.DiplomacyManager;
 
-        regionManager = sm?.RegionManager; 
+        regionManager = GameManager.RegionManager; 
 
         factionManager = GameManager.FactionManager;
 

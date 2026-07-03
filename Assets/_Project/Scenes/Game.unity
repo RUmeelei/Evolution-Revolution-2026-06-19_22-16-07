@@ -2692,23 +2692,24 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1783607600}
+  - {fileID: 1851320069}
+  - {fileID: 144627722}
+  - {fileID: 439860319}
+  - {fileID: 1632028663}
+  - {fileID: 1607962107}
+  - {fileID: 441881603}
+  - {fileID: 1406316715}
+  - {fileID: 1920994763}
+  - {fileID: 278026450}
+  - {fileID: 2002365515}
   - {fileID: 1994458472}
   - {fileID: 134339912}
   - {fileID: 668031013}
-  - {fileID: 1783607600}
-  - {fileID: 439860319}
-  - {fileID: 1632028663}
-  - {fileID: 1851320069}
-  - {fileID: 144627722}
-  - {fileID: 441881603}
-  - {fileID: 1607962107}
-  - {fileID: 1406316715}
   - {fileID: 731582732}
   - {fileID: 1923935309}
-  - {fileID: 1920994763}
-  - {fileID: 2002365515}
-  - {fileID: 278026450}
   - {fileID: 1563698683}
+  - {fileID: 1158761772}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &818345253
@@ -3949,6 +3950,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116486604}
   m_CullTransparentMesh: 1
+--- !u!1 &1158761771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1158761772}
+  - component: {fileID: 1158761773}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1158761772
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1158761771}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 856.6262, y: 425.6352, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 818345252}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1158761773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1158761771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8e5b111a5b23b419c5de477abaeaf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
 --- !u!1 &1208160323
 GameObject:
   m_ObjectHideFlags: 0
