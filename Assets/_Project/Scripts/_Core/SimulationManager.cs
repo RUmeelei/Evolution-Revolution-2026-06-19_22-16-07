@@ -190,6 +190,13 @@ public class SimulationManager : MonoBehaviour
 
             politicsManager.UpdatePolitics(delta);
 
+            if (diplomacyManager == null)
+            {
+                diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+            }
+
+            diplomacyManager.CleanupEvents(tickCounter);
+
             slowTickTimer = 0f;
         }
     }

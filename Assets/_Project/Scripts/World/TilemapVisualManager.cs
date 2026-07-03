@@ -22,6 +22,13 @@ public class TilemapVisualManager : MonoBehaviour
     [Header("Map Modes")]
     [SerializeField] private int mapMode = 0;
 
+    [Header("Buildings")]
+    [SerializeField] private Tilemap buildingsTilemap;
+    [SerializeField] private TileBase farmTile;
+    [SerializeField] private TileBase marketTile;
+    [SerializeField] private TileBase templeTile;
+    [SerializeField] private TileBase wallTile;
+
     private RegionManager regionManager;
     private FactionManager factionManager;
     private SelectionManager selectionManager;
@@ -48,6 +55,8 @@ public class TilemapVisualManager : MonoBehaviour
         baseTilemap.ClearAllTiles();
 
         RedrawAllTiles();
+        
+        RedrawAllBuildings();
     }
 
     void Update()
@@ -200,5 +209,37 @@ public class TilemapVisualManager : MonoBehaviour
 
         baseTilemap.SetTile(tilePos, tileBase);
         baseTilemap.SetColor(tilePos, color);
+    }
+
+    public void UpdateBuildingTile(int x, int y, TileData tile)
+    {
+        if (buildingsTilemap == null) return;
+
+        Vector3Int pos = new Vector3Int(x, y, 0);
+        
+        buildingsTilemap.SetTile(pos, null);
+
+        if (tile.buildings == null || tile.buildings.Count == 0) return;
+        
+        TileBase icon = tile.buildings[0].type switch {BuildingType.Farm => farmTile, BuildingType.Market => marketTile, BuildingType.Temple => templeTile, BuildingType.Wall => wallTile, _ => null};
+
+        if (icon != null)
+        {
+            buildingsTilemap.SetTile(pos, icon);
+            buildingsTilemap.SetColor(pos, Color.white);
+        }
+    }
+
+    public void RedrawAllBuildings()
+    {
+        if (tileManager == null || buildingsTilemap == null) return;
+        
+        for (int y = 0; y < tileManager.height; y++)
+        {
+            for (int x = 0; x < tileManager.width; x++)
+            {
+                UpdateBuildingTile(x, y, tileManager.GetTile(x, y));
+            }
+        }
     }
 }

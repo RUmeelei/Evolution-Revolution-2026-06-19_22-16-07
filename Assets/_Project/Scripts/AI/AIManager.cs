@@ -154,7 +154,7 @@ public class AIManager : MonoBehaviour
 
                         Vector2 worldPos = new Vector2(randomTile.x * tileManager.tileSize + tileManager.tileSize / 2f, randomTile.y * tileManager.tileSize + tileManager.tileSize / 2f);
 
-                        spawnManager.SpawnUnitWithCost(worldPos, fid, 0f);
+                        spawnManager.SpawnUnitWithCost(worldPos, fid, 50f);
                     }
                 }
             }

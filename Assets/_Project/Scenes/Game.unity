@@ -1160,9 +1160,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2d5933e51efda4d8cf41a4359e5775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitManager
-  attackSound: {fileID: 8300000, guid: 4002eaf4b9d3c8e4892662fb6a903393, type: 3}
-  selectSound: {fileID: 8300000, guid: bb58a9b6d385cce458ac391a9869cc0d, type: 3}
-  moveSound: {fileID: 8300000, guid: 36f8d10332009064fbf795bc0464600b, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: 82e309ee092119b4cbb08bff64c4bc8d, type: 3}
+  - {fileID: 8300000, guid: 4002eaf4b9d3c8e4892662fb6a903393, type: 3}
+  - {fileID: 8300000, guid: 53ef1afcdd7743443a98002bc672a457, type: 3}
+  - {fileID: 8300000, guid: 866f6c6934d4a0544ac1f8f30ea0adce, type: 3}
+  - {fileID: 8300000, guid: 4faf3232046a6ea40a03b808ad64fab3, type: 3}
+  - {fileID: 8300000, guid: 013cd14e3a9d3e74a853611972cc785c, type: 3}
+  - {fileID: 8300000, guid: 71a286a864f588946a12dbf61658fad1, type: 3}
+  - {fileID: 8300000, guid: 6515a54deb1b46142bb297d366ac1c2f, type: 3}
+  deathSounds:
+  - {fileID: 8300000, guid: ba58699ef5210824099467fe8e36ee7f, type: 3}
+  - {fileID: 8300000, guid: 0e36bc9d10642a243970acd00549421b, type: 3}
+  - {fileID: 8300000, guid: c04c462eb346b954e821b127046bcc09, type: 3}
+  - {fileID: 8300000, guid: 36dfc3028d45a6a4faf78e7c643fa896, type: 3}
+  - {fileID: 8300000, guid: aae406f24655dae4a8a896a374c13b24, type: 3}
+  - {fileID: 8300000, guid: 76e7b5567421eda46a9fdc08c61d69d4, type: 3}
+  - {fileID: 8300000, guid: d3338af3043675946a642f9a2b8398ae, type: 3}
+  - {fileID: 8300000, guid: b3efc1879fe84b14c9645d4f9b2aceee, type: 3}
+  - {fileID: 8300000, guid: 014c76f0164bbbf4482f941a12bd4cda, type: 3}
+  - {fileID: 8300000, guid: 8f5b4ba5eb1407a4d9da4e3a1cc7482a, type: 3}
+  - {fileID: 8300000, guid: 21812b6f01028ac4d934847be4fe9546, type: 3}
+  - {fileID: 8300000, guid: 3e975e0ed1ea2fb4a80c0ff7f56f77a2, type: 3}
+  - {fileID: 8300000, guid: 22ee33a91745c514f99d986d52150eed, type: 3}
 --- !u!1 &441881602
 GameObject:
   m_ObjectHideFlags: 0
@@ -5759,6 +5779,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   mainMixer: {fileID: 24100000, guid: 909f4f3036d3b82459dce7f58fc20dfd, type: 2}
   poolSize: 200
+  minZoom: 2
+  maxZoom: 50
+  mainCamera: {fileID: 1086166474}
 --- !u!82 &1994458474
 AudioSource:
   m_ObjectHideFlags: 0

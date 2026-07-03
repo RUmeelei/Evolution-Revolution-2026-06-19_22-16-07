@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9356ef9961beb4f46975ee3b0dca5fff, type: 3}
+  m_Name: White
+  m_EditorClassIdentifier: Assembly-CSharp::UnitSpriteData
+  upOpen: {fileID: 3785572671817501473, guid: 218a0324e7664d347b19d9146e7574d8, type: 3}
+  downOpen: {fileID: 7096292346567432916, guid: 218a0324e7664d347b19d9146e7574d8, type: 3}
+  leftOpen: {fileID: -4774706631702797510, guid: 218a0324e7664d347b19d9146e7574d8, type: 3}
+  rightOpen: {fileID: 4160436208241395165, guid: 218a0324e7664d347b19d9146e7574d8, type: 3}
+  upClosed: {fileID: -5625431415400606625, guid: c52cca2b2c147bd428e9f4fd3de2ddc2, type: 3}
+  downClosed: {fileID: 6941496967060668545, guid: c52cca2b2c147bd428e9f4fd3de2ddc2, type: 3}
+  leftClosed: {fileID: 5137899403527515556, guid: c52cca2b2c147bd428e9f4fd3de2ddc2, type: 3}
+  rightClosed: {fileID: -56766438011180837, guid: c52cca2b2c147bd428e9f4fd3de2ddc2, type: 3}

@@ -17,6 +17,8 @@ public class FactionData : ScriptableObject
     public string factionName;
     public string rulerName;
 
+    public UnitSpriteData unitSpriteData;
+
     public Vector2Int startingHex;
 
     public Color factionColor;

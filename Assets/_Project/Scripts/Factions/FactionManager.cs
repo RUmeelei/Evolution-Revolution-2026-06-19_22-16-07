@@ -24,18 +24,21 @@ public class FactionManager : MonoBehaviour
     public bool IsPlayerFaction(int factionId)
     {
         FactionData data = GetFaction(factionId);
+
         return data != null && data.isPlayer;
     }
     
     public Sprite GetUnitSprite(int factionId)
     {
         FactionData data = GetFaction(factionId);
+
         return data != null ? data.unitSprite : null;
     }
     
     public Color GetSelectionColor(int factionId)
     {
         FactionData data = GetFaction(factionId);
+        
         return data != null ? data.selectionColor : Color.green;
     }
 }

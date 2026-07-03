@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using System.Collections.Generic;
 
 public class UnitVisualManager : MonoBehaviour
@@ -8,6 +9,11 @@ public class UnitVisualManager : MonoBehaviour
     [SerializeField] private SpriteRenderer humanPrefab;
     [SerializeField] private UnitManager unitManager;
     [SerializeField] private int poolSize = 4000;
+    [SerializeField] private bool enableDamageFlash = true;
+    [SerializeField] private bool enableFactionColors = true;
+
+    private Dictionary<int, float> blinkTimers = new();
+    private Dictionary<int, bool> eyesClosed = new();
 
     [Header("Bars")]
     [SerializeField] private SpriteRenderer healthBarPrefab;
@@ -39,12 +45,6 @@ public class UnitVisualManager : MonoBehaviour
     public float SpriteRadius => spriteRadius;
 
     private SpriteRenderer[] pool;
-
-    private Dictionary<int, Sprite> cachedUnitSprites = new();
-    private Dictionary<int, Color> cachedFactionColors = new();
-    private Dictionary<int, Color> cachedSelectionColors = new();
-
-    private int lastCacheFrame = -1;
 
     private float cachedPlayerLoyalty = 50f;
     private int lastLoyaltyFrame = -1;
@@ -147,22 +147,11 @@ public class UnitVisualManager : MonoBehaviour
             {
                 for (int i = 0; i < factionManager.FactionCount; i++)
                 {
-                    if (factionManager.GetFaction(i).isPlayer) playerFactionId = i;
+                    if (factionManager.IsPlayerFaction(i)) playerFactionId = i;
                 }
             }
 
             cachedPlayerLoyalty = politicsManager.GetFactionLoyalty(playerFactionId);
-        }
-
-        if (lastCacheFrame != Time.frameCount)
-        {
-            lastCacheFrame = Time.frameCount;
-
-            cachedUnitSprites.Clear();
-
-            cachedFactionColors.Clear();
-
-            cachedSelectionColors.Clear();
         }
 
         float lastTickTime = simulationManager?.LastTickTime ?? Time.time;
@@ -196,20 +185,31 @@ public class UnitVisualManager : MonoBehaviour
             if (mainIndex < pool.Length)
             {
                 int fid = humans[i].factionId;
-    
-                if (!cachedUnitSprites.ContainsKey(fid))
+                FactionData fd = factionManager.GetFaction(fid);
+
+                if (fd?.unitSpriteData == null) continue;
+                
+                if (!blinkTimers.ContainsKey(i))
                 {
-                    FactionData fd = factionManager.GetFaction(fid);
-    
-                    cachedUnitSprites[fid] = fd?.unitSprite;
-                    cachedFactionColors[fid] = fd?.factionColor ?? Color.white;
-                    cachedSelectionColors[fid] = fd?.selectionColor ?? Color.green;
+                    blinkTimers[i] = Random.Range(1f, 4f);
+
+                    eyesClosed[i] = false;
                 }
-                Sprite sprite = cachedUnitSprites[fid];
-    
+                
+                blinkTimers[i] -= Time.deltaTime;
+
+                if (blinkTimers[i] <= 0f)
+                {
+                    eyesClosed[i] = !eyesClosed[i];
+
+                    blinkTimers[i] = eyesClosed[i] ? Random.Range(0.1f, 0.3f) : Random.Range(2f, 5f);
+                }
+                
+                Sprite sprite = fd.unitSpriteData.GetSprite(humans[i].velocity, eyesClosed[i]);
+
                 if (sprite != null) pool[mainIndex].sprite = sprite;
                 
-                if (damageFlashTimers.TryGetValue(i, out float flashTime) && flashTime > 0f)
+                if (damageFlashTimers.TryGetValue(i, out float flashTime) && flashTime > 0f && enableDamageFlash)
                 {
                     pool[mainIndex].color = damageColor;
 
@@ -219,7 +219,10 @@ public class UnitVisualManager : MonoBehaviour
                 }
                 else
                 {
-                    pool[mainIndex].color = selectionManager != null && selectionManager.IsSelected(i) ? cachedSelectionColors[fid] : cachedFactionColors[fid];
+                    Color factionColor = enableFactionColors ? fd.factionColor : Color.white;
+                    Color selectionColor = enableFactionColors ? fd.selectionColor : Color.green;
+
+                    pool[mainIndex].color = selectionManager != null && selectionManager.IsSelected(i) ? selectionColor : factionColor;
                 }
                 
                 pool[mainIndex].enabled = true;
@@ -263,6 +266,17 @@ public class UnitVisualManager : MonoBehaviour
                 else if (cachedPlayerLoyalty < 10f) { icon.sprite = desertingIcon; icon.enabled = true; }
 
                 iconIndex++;
+            }
+        }
+        
+        if (Time.frameCount % 100 == 0)
+        {
+            var dead = blinkTimers.Keys.Where(k => k >= humans.Length || !humans[k].isAlive).ToList();
+
+            foreach (var key in dead)
+            {
+                blinkTimers.Remove(key);
+                eyesClosed.Remove(key);
             }
         }
         

@@ -15,6 +15,7 @@ MonoBehaviour:
   factionId: 1
   factionName: "\u0420\u043E\u0441\u0441\u0438\u044F"
   rulerName: "\u041F\u0443\u0442\u0438\u043D"
+  unitSpriteData: {fileID: 11400000, guid: 432597a58af93394190cd5420f6c5fbf, type: 2}
   startingHex: {x: 5, y: 5}
   factionColor: {r: 0, g: 0.509434, b: 0, a: 1}
   startingFood: 250

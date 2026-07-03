@@ -15,9 +15,10 @@ public class UnitManager : MonoBehaviour
     private SelectionManager selectionManager;
     private PoliticsManager politicsManager;
 
-    [SerializeField] private AudioClip attackSound;
-    [SerializeField] private AudioClip selectSound;
-    [SerializeField] private AudioClip moveSound;
+    [SerializeField] private AudioClip[] attackSounds;
+    [SerializeField] private AudioClip[] deathSounds;
+    // [SerializeField] private AudioClip selectSound;
+    // [SerializeField] private AudioClip moveSound;
 
     public void Initialize(int maxHumans)
     {
@@ -112,7 +113,7 @@ public class UnitManager : MonoBehaviour
         {
             humans[index].targetPosition = pos;
 
-            AudioManager.Instance?.PlayClipAtPosition(moveSound, humans[index].position);
+            // AudioManager.Instance?.PlayClipAtPosition(moveSound, humans[index].position);
 
             if (!humans[index].isExhausted)
             {
@@ -168,7 +169,7 @@ public class UnitManager : MonoBehaviour
             } 
         }
 
-        AudioManager.Instance?.PlayClipAtPosition(selectSound, sPos);
+        // AudioManager.Instance?.PlayClipAtPosition(selectSound, sPos);
 
         return result;
     }
@@ -189,7 +190,7 @@ public class UnitManager : MonoBehaviour
             {
                 result.Add(i);
 
-                AudioManager.Instance?.PlayClipAtPosition(selectSound, humans[i].position);
+                // AudioManager.Instance?.PlayClipAtPosition(selectSound, humans[i].position);
             } 
         }
 
@@ -215,6 +216,10 @@ public class UnitManager : MonoBehaviour
         {
             humans[index].isAlive = false;
             aliveCount--;
+
+            AudioClip deathSound = deathSounds[Random.Range(0, deathSounds.Length)];
+
+            AudioManager.Instance?.PlayClipAtPosition(deathSound, humans[index].position);
 
             if (selectionManager != null && selectionManager.IsSelected(index)) selectionManager.SelectedUnits.Remove(index);
         }
@@ -318,6 +323,8 @@ public class UnitManager : MonoBehaviour
                     human.attackTimer = human.attackCooldown;
 
                     unitVisualManager?.TriggerDamageFlash(enemyIndex);
+
+                    AudioClip attackSound = attackSounds[Random.Range(0, attackSounds.Length)];
 
                     AudioManager.Instance?.PlayClipAtPosition(attackSound, humans[enemyIndex].position);
                 }

@@ -71,6 +71,11 @@ public class DiplomacyManager : MonoBehaviour
         rel.tension = 100f;
 
         AddEvent(DiplomacyEventType.DeclaredWar, a, b, 100f);
+
+        if (factionManager.IsPlayerFaction(a) || factionManager.IsPlayerFaction(b))
+        {
+            AudioManager.Instance?.PlayRandomMusic();
+        }
     }
 
     public void MakePeace(int a, int b)
@@ -185,5 +190,10 @@ public class DiplomacyManager : MonoBehaviour
             magnitude = magnitude
         };
         eventHistory.Add(evt);
+    }
+
+    public void CleanupEvents(int currentTick)
+    {
+        eventHistory.RemoveAll(e => currentTick - e.tick > 1000);
     }
 }

@@ -174,7 +174,7 @@ public class PoliticsManager : MonoBehaviour
                 
                 float avgSatisfaction = (state.foodSatisfaction + state.securitySatisfaction + state.tradeSatisfaction + state.ideologySatisfaction) / 4f + buildingBonus;
 
-                float targetLoyalty = avgSatisfaction * 100f;
+                float targetLoyalty = Mathf.Min(avgSatisfaction * 100f, 100f);
 
                 state.loyalty = Mathf.MoveTowards(state.loyalty, targetLoyalty, delta * 5f);
                 
@@ -237,7 +237,9 @@ public class PoliticsManager : MonoBehaviour
 
                     tileManager.AddBuildingCount(f, neededBuilding);
 
-                    Debug.Log($"Фракция {f} построила {neededBuilding} на тайле ({bestPos.x},{bestPos.y}) для группы {state.archetype}");
+                    TilemapVisualManager tvm = FindFirstObjectByType<TilemapVisualManager>();
+
+                    tvm?.UpdateBuildingTile(bestPos.x, bestPos.y, bestTile);
 
                     break;
                 }
