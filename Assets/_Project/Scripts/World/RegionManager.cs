@@ -11,6 +11,11 @@ public class RegionManager
 
     public IReadOnlyList<RegionData> AllRegions => regions;
 
+    void Awake()
+    {
+        GameManager.RegisterRegionManager(this);
+    }
+
     public void Initialize(int maxFactionsCount)
     {
         maxFactions = maxFactionsCount;
@@ -80,6 +85,148 @@ public class RegionManager
             reg.isConstested = constested;
             regions[i] = reg;
             regionsById[reg.id] = reg;
+        }
+    }
+
+    public void GenerateNeutralRegions(TileManager manager)
+    {
+        for (int i = 0; i < manager.Tiles.Length; i++)
+        {
+            manager.Tiles[i].regionId = -1;
+        }
+
+        regions.Clear();
+
+        regionsById.Clear();
+
+        if (manager.factionCenters == null || manager.factionCenters.Count == 0)
+        {
+            Debug.LogError("Нет центров для создания регионов!"); return;
+        }
+
+        int maxRegionSize = 16;
+        int nextRegionId = 0;
+        
+        List<RegionData> allRegions = new List<RegionData>();
+        
+        for (int i = 0; i < manager.factionCenters.Count; i++)
+        {
+            RegionData region = new RegionData();
+
+            region.id = nextRegionId;
+            region.factionId = i;
+            region.tiles = new List<Vector2Int>();
+
+            allRegions.Add(region);
+
+            regionsById[nextRegionId] = region;
+
+            nextRegionId++;
+        }
+        
+        for (int y = 0; y < manager.height; y++)
+        {
+            for (int x = 0; x < manager.width; x++)
+            {
+                TileData tile = manager.GetTile(x, y);
+
+                if (tile.tileType == TileType.Water) continue;
+
+                int nearestCenterIndex = -1;
+
+                float nearestDist = float.MaxValue;
+
+                for (int i = 0; i < manager.factionCenters.Count; i++)
+                {
+                    Vector2Int center = manager.factionCenters[i];
+
+                    float dist = Vector2Int.Distance(new Vector2Int(x, y), center);
+
+                    if (dist < nearestDist)
+                    {
+                        nearestDist = dist;
+                        nearestCenterIndex = i;
+                    }
+                }
+
+                if (nearestCenterIndex == -1) continue;
+                
+                int targetRegionId = -1;
+
+                foreach (var region in allRegions)
+                {
+                    if (region.factionId == nearestCenterIndex && region.tiles.Count < maxRegionSize)
+                    {
+                        targetRegionId = region.id; break;
+                    }
+                }
+                
+                if (targetRegionId == -1)
+                {
+                    RegionData newRegion = new RegionData();
+
+                    newRegion.id = nextRegionId;
+                    newRegion.factionId = nearestCenterIndex;
+                    newRegion.tiles = new List<Vector2Int>();
+
+                    allRegions.Add(newRegion);
+
+                    regionsById[nextRegionId] = newRegion;
+
+                    targetRegionId = nextRegionId;
+
+                    nextRegionId++;
+                }
+                
+                manager.Tiles[y * manager.width + x].regionId = targetRegionId;
+                
+                for (int i = 0; i < allRegions.Count; i++)
+                {
+                    if (allRegions[i].id == targetRegionId)
+                    {
+                        allRegions[i].tiles.Add(new Vector2Int(x, y)); break;
+                    }
+                }
+            }
+        }
+        
+        regions = allRegions;
+        
+        regionsById.Clear();
+
+        foreach (var region in regions)
+        {
+            regionsById[region.id] = region;
+        }
+    }
+
+    private void FloodFillNeutral(TileManager manager, int startX, int startY, int regionId, List<Vector2Int> tilesList)
+    {
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+
+        queue.Enqueue(new Vector2Int(startX, startY));
+
+        while (queue.Count > 0)
+        {
+            Vector2Int current = queue.Dequeue();
+
+            int x = current.x;
+            int y = current.y;
+
+            if (x < 0 || x >= manager.width || y < 0 || y >= manager.height) continue;
+
+            TileData tile = manager.GetTile(x, y);
+
+            if (tile.tileType == TileType.Water || tile.regionId != -1) continue;
+
+            manager.Tiles[y * manager.width + x].regionId = regionId;
+
+            tilesList.Add(new Vector2Int(x, y));
+            
+            queue.Enqueue(new Vector2Int(x + 1, y));
+            queue.Enqueue(new Vector2Int(x - 1, y));
+            queue.Enqueue(new Vector2Int(x, y + 1));
+            queue.Enqueue(new Vector2Int(x, y - 1));
         }
     }
 

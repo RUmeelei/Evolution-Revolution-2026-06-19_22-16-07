@@ -12,9 +12,14 @@ public class WinConditionManager : MonoBehaviour
 
     private List<TileData> waterTiles = new List<TileData>();
 
+    void Awake()
+    {
+        GameManager.RegisterWinConditionManager(this);
+    }
+
     public void Initialize()
     {
-        SimulationManager sm = FindFirstObjectByType<SimulationManager>();
+        SimulationManager sm = GameManager.SimulationManager;
 
         regionManager = sm?.RegionManager;
     }
@@ -23,7 +28,7 @@ public class WinConditionManager : MonoBehaviour
     {
         if (gameEnded) return;
 
-        TileManager tm = FindFirstObjectByType<TileManager>();
+        TileManager tm = GameManager.TileManager;
 
         if (tm == null) return;
 
@@ -65,11 +70,11 @@ public class WinConditionManager : MonoBehaviour
         {
             gameEnded = true;
 
-            FactionManager fm = FindFirstObjectByType<FactionManager>();
+            FactionManager fm = GameManager.FactionManager;
 
             string factionName = fm?.GetFaction(maxFaction)?.factionName ?? maxFaction.ToString();
 
-            SimulationManager sm = FindFirstObjectByType<SimulationManager>();
+            SimulationManager sm = GameManager.SimulationManager;
 
             sm?.StopSimulation();
 

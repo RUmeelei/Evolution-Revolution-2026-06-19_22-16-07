@@ -29,13 +29,13 @@ public class TileVisualManager : MonoBehaviour
     {
         tileManager = manager;
 
-        if (tileManager == null) tileManager = FindFirstObjectByType<TileManager>();
+        if (tileManager == null) tileManager = GameManager.TileManager;
 
         if (cameraManager == null) cameraManager = FindFirstObjectByType<CameraManager>();
 
         if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
 
-        SimulationManager sm = FindFirstObjectByType<SimulationManager>();
+        SimulationManager sm = GameManager.SimulationManager;
         regionManager = sm?.RegionManager;
 
         int visibleTilesX = Mathf.CeilToInt(2f * cameraManager.MaxZoom * cam.aspect / tileManager.tileSize);
@@ -53,7 +53,7 @@ public class TileVisualManager : MonoBehaviour
             pool[i].GetComponent<SpriteRenderer>().sortingLayerName = "Tiles";
         }
 
-        if (simulationManager == null) simulationManager = FindFirstObjectByType<SimulationManager>();
+        if (simulationManager == null) simulationManager = GameManager.SimulationManager;
     }
 
     void Update()

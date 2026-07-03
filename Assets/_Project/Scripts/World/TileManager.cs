@@ -16,6 +16,8 @@ public class TileManager : MonoBehaviour
     [SerializeField] private float waterThreshold = 0.4f;
     [SerializeField] private float mountainThreshold = 0.7f;
 
+    public List<Vector2Int> factionCenters = new List<Vector2Int>();
+
     private TileData[] tiles;
 
     public TileData[] Tiles => tiles;
@@ -29,13 +31,18 @@ public class TileManager : MonoBehaviour
     private FactionManager factionManager;
     private UnitManager unitManager;
 
+    void Awake()
+    {
+        GameManager.RegisterTileManager(this);
+    }
+
     public void Initialize()
     {
         tiles = new TileData[width * height];
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
 
         maxFactions = factionManager.FactionCount;
 
@@ -134,29 +141,40 @@ public class TileManager : MonoBehaviour
                     tiles[i].tileType = TileType.Water;
                     tiles[i].foodAmount = 0f;
                 }
-                
-                for (int f = 0; f < factionManager.FactionCount; f++)
-                {
-                    FactionData fd = factionManager.GetFaction(f);
-            
-                    if (fd == null) continue;
-            
-                    int hexSize = 16;
-                    int startTileX = fd.startingHex.x * hexSize;
-                    int startTileY = fd.startingHex.y * hexSize;
-            
-                    if (x >= startTileX && x < startTileX + hexSize && y >= startTileY && y < startTileY + hexSize && tiles[i].tileType != TileType.Water)
-                    {
-                        tiles[i].factionId = f;
-            
-                        break;
-                    }
-                }
 
                 tiles[i].unitsByFaction = new int[maxFactions];
 
                 tiles[i].buildings = new List<BuildingData>();
             }
+        }
+        
+        List<Vector2Int> availableTiles = new List<Vector2Int>();
+        
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (tiles[y * width + x].tileType != TileType.Water)
+                {
+                    availableTiles.Add(new Vector2Int(x, y));
+                }
+            }
+        }
+        
+        for (int i = availableTiles.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+
+            (availableTiles[i], availableTiles[j]) = (availableTiles[j], availableTiles[i]);
+        }
+        
+        factionCenters.Clear();
+
+        for (int f = 0; f < factionManager.FactionCount; f++)
+        {
+            if (f >= availableTiles.Count) break;
+
+            factionCenters.Add(availableTiles[f]);
         }
     }
 

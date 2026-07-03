@@ -30,15 +30,20 @@ public class PoliticsManager : MonoBehaviour
     private TileManager tileManager;
     private EconomyManager economyManager;
 
+    void Awake()
+    {
+        GameManager.RegisterPoliticsManager(this);
+    }
+
     public void Initialize()
     {
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
-        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+        diplomacyManager = GameManager.DiplomacyManager;
 
-        tileManager = FindFirstObjectByType<TileManager>();
+        tileManager = GameManager.TileManager;
 
-        economyManager = FindFirstObjectByType<EconomyManager>();
+        economyManager = GameManager.EconomyManager;
 
         int factionCount = factionManager.FactionCount;
 
@@ -94,11 +99,11 @@ public class PoliticsManager : MonoBehaviour
 
     public void UpdatePolitics(float delta)
     {
-        EconomyManager economy = FindFirstObjectByType<EconomyManager>();
+        EconomyManager economy = GameManager.EconomyManager;
 
         if (diplomacyManager == null)
         {
-            diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+            diplomacyManager = GameManager.DiplomacyManager;
         }
 
         for (int f = 0; f < factionGroups.Length; f++)
@@ -165,10 +170,10 @@ public class PoliticsManager : MonoBehaviour
 
                     switch (state.archetype)
                     {
-                        case SocialGroupArchetype.Producers: buildingBonus = farmCount * 0.1f; break;
-                        case SocialGroupArchetype.Traders: buildingBonus = marketCount * 0.1f; break;
-                        case SocialGroupArchetype.Ideologists: buildingBonus = templeCount * 0.1f; break;
-                        case SocialGroupArchetype.Military: buildingBonus = wallCount * 0.1f; break;
+                        case SocialGroupArchetype.Producers: buildingBonus = Mathf.Min(farmCount * 0.1f, 0.3f); break;
+                        case SocialGroupArchetype.Traders: buildingBonus = Mathf.Min(marketCount * 0.1f, 0.3f); break;
+                        case SocialGroupArchetype.Ideologists: buildingBonus = Mathf.Min(templeCount * 0.1f, 0.3f); break;
+                        case SocialGroupArchetype.Military: buildingBonus = Mathf.Min(wallCount * 0.1f, 0.3f); break;
                     }
                 }
                 
@@ -237,7 +242,7 @@ public class PoliticsManager : MonoBehaviour
 
                     tileManager.AddBuildingCount(f, neededBuilding);
 
-                    TilemapVisualManager tvm = FindFirstObjectByType<TilemapVisualManager>();
+                    TilemapVisualManager tvm = GameManager.TilemapVisualManager;
 
                     tvm?.UpdateBuildingTile(bestPos.x, bestPos.y, bestTile);
 

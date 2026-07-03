@@ -33,9 +33,14 @@ public class DiplomacyManager : MonoBehaviour
 
     private List<DiplomacyEvent> eventHistory = new();
 
+    void Awake()
+    {
+        GameManager.RegisterDiplomacyManager(this);
+    }
+
     public void Initialize()
     {
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
     }
     
     public DiplomacyData GetRelations(int factionA, int factionB)
@@ -74,7 +79,7 @@ public class DiplomacyManager : MonoBehaviour
 
         if (factionManager.IsPlayerFaction(a) || factionManager.IsPlayerFaction(b))
         {
-            AudioManager.Instance?.PlayRandomMusic();
+            AudioManager.Instance?.PlayMusic(8);
         }
     }
 

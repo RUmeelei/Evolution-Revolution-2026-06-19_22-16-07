@@ -40,6 +40,8 @@ public class AudioManager : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
+
+        GameManager.RegisterAudioManager(this);
         
         sfxSources = new AudioSource[poolSize];
 
@@ -64,7 +66,7 @@ public class AudioManager : MonoBehaviour
         musicSource.playOnAwake = false;
         musicSource.spatialBlend = 0f;
 
-        simulationManager = FindFirstObjectByType<SimulationManager>();
+        simulationManager = GameManager.SimulationManager;
     }
     
     public void PlayClipAtPosition(AudioClip clip, Vector2 position)
@@ -81,7 +83,7 @@ public class AudioManager : MonoBehaviour
         
         if ((minZoom >= maxZoom || maxZoom <= 0f) && mainCamera != null)
         {
-            float fallbackVolume = Mathf.Clamp01(1f - (mainCamera.orthographicSize / 100f));
+            float fallbackVolume = Mathf.Clamp01(1f - (mainCamera.orthographicSize / 80f));
 
             if (fallbackVolume <= 0f) return;
         }
@@ -97,14 +99,18 @@ public class AudioManager : MonoBehaviour
     public void UpdateZoom(float currentZoom)
     {
         if (sfxSources == null) return;
-        
-        float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, currentZoom);
 
+        float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, currentZoom);
         float effectiveMaxDist = Mathf.Lerp(80f, 20f, zoomFactor);
+        float volume = 1f - Mathf.Clamp01(zoomFactor);
 
         foreach (var source in sfxSources)
         {
-            if (source != null) source.maxDistance = effectiveMaxDist;
+            if (source != null)
+            {
+                source.maxDistance = effectiveMaxDist;
+                source.volume = volume;
+            }
         }
     }
     

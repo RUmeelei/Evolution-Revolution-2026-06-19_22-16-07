@@ -21,6 +21,6 @@ MonoBehaviour:
   startingFood: 250
   startingUnits: 5
   rulerCharacter: 3
-  isPlayer: 1
+  isPlayer: 0
   unitSprite: {fileID: 2269961892177271623, guid: 6eb76dbef940ab64aa0d40c879f89e74, type: 3}
   selectionColor: {r: 1, g: 0, b: 0, a: 1}

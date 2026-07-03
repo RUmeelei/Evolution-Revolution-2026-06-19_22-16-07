@@ -7,15 +7,20 @@ public class SpawnManager : MonoBehaviour
     private TileManager tileManager;
     private FactionManager factionManager;
 
+    void Awake()
+    {
+        GameManager.RegisterSpawnManager(this);
+    }
+
     public void Initialize()
     {
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
 
-        economyManager = FindFirstObjectByType<EconomyManager>();
+        economyManager = GameManager.EconomyManager;
 
-        tileManager = FindFirstObjectByType<TileManager>();
+        tileManager = GameManager.TileManager;
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
     }
 
     void Update()

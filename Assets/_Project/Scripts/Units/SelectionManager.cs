@@ -25,12 +25,14 @@ public class SelectionManager : MonoBehaviour
     {
         cam = Camera.main;
 
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
+
+        GameManager.RegisterSelectionManager(this);
     }
 
     void Update()
     {
-        TileManager tm = FindFirstObjectByType<TileManager>();
+        TileManager tm = GameManager.TileManager;
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -176,6 +178,11 @@ public class SelectionManager : MonoBehaviour
     public int GetFirstSelectedUnit()
     {
         return selectedUnits.Count > 0 ? selectedUnits[0] : -1;
+    }
+
+    public void SetLastClickedTile(Vector2Int tilePos)
+    {
+        lastClickedTile = tilePos;
     }
 
     public Vector2Int? GetLastClickedTile() => lastClickedTile;

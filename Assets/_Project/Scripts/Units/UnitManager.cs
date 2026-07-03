@@ -20,17 +20,22 @@ public class UnitManager : MonoBehaviour
     // [SerializeField] private AudioClip selectSound;
     // [SerializeField] private AudioClip moveSound;
 
+    void Awake()
+    {
+        GameManager.RegisterUnitManager(this);
+    }
+
     public void Initialize(int maxHumans)
     {
         humans = new HumanData[maxHumans];
 
-        if (unitVisualManager == null) unitVisualManager = FindFirstObjectByType<UnitVisualManager>();
+        if (unitVisualManager == null) unitVisualManager = GameManager.UnitVisualManager;
 
-        if (factionManager == null) factionManager = FindFirstObjectByType<FactionManager>();
+        if (factionManager == null) factionManager = GameManager.FactionManager;
 
         if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
 
-        if (politicsManager == null) politicsManager = FindFirstObjectByType<PoliticsManager>();
+        if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
     }
 
     void Update()
@@ -276,7 +281,7 @@ public class UnitManager : MonoBehaviour
 
     public void Tick(float delta)
     {
-        if (tileManager == null) tileManager = FindFirstObjectByType<TileManager>();
+        if (tileManager == null) tileManager = GameManager.TileManager;
 
         for (int i = 0; i < humans.Length; i++)
         {

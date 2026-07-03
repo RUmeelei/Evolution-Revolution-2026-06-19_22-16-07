@@ -54,50 +54,50 @@ public class SimulationManager : MonoBehaviour
 
     void Awake()
     {
-        factionManager = FindFirstObjectByType<FactionManager>();
-
+        factionManager = GameManager.FactionManager;
         factionManager.Initialize();
 
-        tileManager = FindFirstObjectByType<TileManager>();
-        tileVisualManager = FindFirstObjectByType<TilemapVisualManager>();
-
+        tileManager = GameManager.TileManager;
         tileManager.Initialize();
-
-        regionManager = new RegionManager();
-        regionManager.Initialize(20);
         
+        regionManager = new RegionManager();
+        regionManager.Initialize(factionManager.FactionCount);
+        regionManager.GenerateNeutralRegions(tileManager);
+        
+        factionManager.AssignFactionsToRegions(regionManager, tileManager);
+        
+        tileVisualManager = GameManager.TilemapVisualManager;
         tileVisualManager.Initialize(tileManager);
         tileVisualManager.RedrawAllTiles();
+        
+        unitManager = GameManager.UnitManager;
 
-        unitManager = FindFirstObjectByType<UnitManager>();
-        unitVisualManager = FindFirstObjectByType<UnitVisualManager>();
+        unitVisualManager = GameManager.UnitVisualManager;
 
         unitManager.Initialize(1000);
+
         unitVisualManager.Initialize(unitManager);
         
-        economyManager = FindFirstObjectByType<EconomyManager>();
-
+        economyManager = GameManager.EconomyManager;
         economyManager.Initialize();
-
-        aiManager = FindFirstObjectByType<AIManager>();
-
+        
+        aiManager = GameManager.AIManager;
         aiManager.Initialize();
-
-        spawnManager = FindFirstObjectByType<SpawnManager>();
-
+        
+        spawnManager = GameManager.SpawnManager;
         spawnManager.Initialize();
-
-        winConditionManager = FindFirstObjectByType<WinConditionManager>();
-
+        // spawnManager.SpawnStartingUnits();
+        
+        winConditionManager = GameManager.WinConditionManager;
         winConditionManager.Initialize();
 
-        politicsManager = FindFirstObjectByType<PoliticsManager>();
-
+        politicsManager = GameManager.PoliticsManager;
         politicsManager.Initialize();
 
-        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
-
+        diplomacyManager = GameManager.DiplomacyManager;
         diplomacyManager.Initialize();
+
+        GameManager.RegisterSimulationManager(this);
     }
     
     void Update()
@@ -140,7 +140,7 @@ public class SimulationManager : MonoBehaviour
 
         if (unitManager == null)
         {
-            unitManager = FindFirstObjectByType<UnitManager>();
+            unitManager = GameManager.UnitManager;
         }
 
         unitManager.Tick(delta);
@@ -155,19 +155,19 @@ public class SimulationManager : MonoBehaviour
 
             if (unitManager == null)
             {
-                unitManager = FindFirstObjectByType<UnitManager>();
+                unitManager = GameManager.UnitManager;
             }
 
             if (economyManager == null)
             {
-                economyManager = FindFirstObjectByType<EconomyManager>();
+                economyManager = GameManager.EconomyManager;
             }
 
             economyManager.ProcessEconomy(delta);
 
             if (aiManager == null)
             {
-                aiManager = FindFirstObjectByType<AIManager>();
+                aiManager = GameManager.AIManager;
             }
 
             aiManager.ProcessAI(delta);
@@ -176,7 +176,7 @@ public class SimulationManager : MonoBehaviour
 
             if (tileManager == null)
             {
-                tileManager = FindFirstObjectByType<TileManager>();
+                tileManager = GameManager.TileManager;
             }
 
             tileManager.UpdateTileOwnership();
@@ -185,14 +185,14 @@ public class SimulationManager : MonoBehaviour
 
             if (politicsManager == null)
             {
-                politicsManager = FindFirstObjectByType<PoliticsManager>();
+                politicsManager = GameManager.PoliticsManager;
             }
 
             politicsManager.UpdatePolitics(delta);
 
             if (diplomacyManager == null)
             {
-                diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+                diplomacyManager = GameManager.DiplomacyManager;
             }
 
             diplomacyManager.CleanupEvents(tickCounter);
@@ -210,14 +210,14 @@ public class SimulationManager : MonoBehaviour
 
             if (winConditionManager == null)
             {
-                winConditionManager = FindFirstObjectByType<WinConditionManager>();
+                winConditionManager = GameManager.WinConditionManager;
             }
             
             winConditionManager.CheckVictory();
 
             if (politicsManager == null)
             {
-                politicsManager = FindFirstObjectByType<PoliticsManager>();
+                politicsManager = GameManager.PoliticsManager;
             }
 
             politicsManager.ProcessConstruction();

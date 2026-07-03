@@ -14,19 +14,24 @@ public class AIManager : MonoBehaviour
     private FactionManager factionManager;
     private DiplomacyManager diplomacyManager;
 
+    void Awake()
+    {
+        GameManager.RegisterAIManager(this);
+    }
+
     public void Initialize()
     {
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
 
-        tileManager = FindFirstObjectByType<TileManager>();
+        tileManager = GameManager.TileManager;
 
-        economyManager = FindFirstObjectByType<EconomyManager>();
+        economyManager = GameManager.EconomyManager;
 
-        spawnManager = FindFirstObjectByType<SpawnManager>();
+        spawnManager = GameManager.SpawnManager;
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
-        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+        diplomacyManager = GameManager.DiplomacyManager;
     }
 
     public void ProcessAI(float delta)
@@ -154,7 +159,12 @@ public class AIManager : MonoBehaviour
 
                         Vector2 worldPos = new Vector2(randomTile.x * tileManager.tileSize + tileManager.tileSize / 2f, randomTile.y * tileManager.tileSize + tileManager.tileSize / 2f);
 
-                        spawnManager.SpawnUnitWithCost(worldPos, fid, 50f);
+                        float cost = 50f;
+
+                        if (economyManager.GetFood(fid) >= cost)
+                        {
+                            spawnManager.SpawnUnitWithCost(worldPos, fid, cost);
+                        }
                     }
                 }
             }

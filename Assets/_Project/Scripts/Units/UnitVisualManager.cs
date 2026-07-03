@@ -57,11 +57,16 @@ public class UnitVisualManager : MonoBehaviour
     private PoliticsManager politicsManager;
     private TileManager tileManager;
 
+    void Awake()
+    {
+        GameManager.RegisterUnitVisualManager(this);
+    }
+
     public void Initialize(UnitManager manager)
     {
         unitManager = manager;
 
-        if (unitManager == null) unitManager = FindFirstObjectByType<UnitManager>();
+        if (unitManager == null) unitManager = GameManager.UnitManager;
 
         pool = new SpriteRenderer[poolSize];
 
@@ -72,13 +77,13 @@ public class UnitVisualManager : MonoBehaviour
             pool[i].GetComponent<SpriteRenderer>().sortingLayerName = "Units";
         }
 
-        if (simulationManager == null) simulationManager = FindFirstObjectByType<SimulationManager>();
+        if (simulationManager == null) simulationManager = GameManager.SimulationManager;
 
-        if (factionManager == null) factionManager = FindFirstObjectByType<FactionManager>();
+        if (factionManager == null) factionManager = GameManager.FactionManager;
 
-        if (politicsManager == null) politicsManager = FindFirstObjectByType<PoliticsManager>();
+        if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
 
-        if (tileManager == null) tileManager = FindFirstObjectByType<TileManager>();
+        if (tileManager == null) tileManager = GameManager.TileManager;
 
         spriteRadius = humanPrefab.sprite.bounds.size.x / 1.2f;
 
@@ -131,13 +136,13 @@ public class UnitVisualManager : MonoBehaviour
 
         if (humans == null) return;
         
-        if (simulationManager == null) simulationManager = FindFirstObjectByType<SimulationManager>();
+        if (simulationManager == null) simulationManager = GameManager.SimulationManager;
 
         if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
 
-        if (factionManager == null) factionManager = FindFirstObjectByType<FactionManager>();
+        if (factionManager == null) factionManager = GameManager.FactionManager;
 
-        if (politicsManager == null) politicsManager = FindFirstObjectByType<PoliticsManager>();
+        if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
 
         if (lastLoyaltyFrame != Time.frameCount)
         {

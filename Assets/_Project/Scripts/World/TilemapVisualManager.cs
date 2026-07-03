@@ -34,23 +34,28 @@ public class TilemapVisualManager : MonoBehaviour
     private SelectionManager selectionManager;
     private DiplomacyManager diplomacyManager;
 
+    void Awake()
+    {
+        GameManager.RegisterTilemapVisualManager(this);
+    }
+
     public void Initialize(TileManager manager)
     {
         tileManager = manager;
 
-        if (tileManager == null) tileManager = FindFirstObjectByType<TileManager>();
+        if (tileManager == null) tileManager = GameManager.TileManager;
 
         if (baseTilemap == null) baseTilemap = GetComponent<Tilemap>();
 
-        SimulationManager sm = FindFirstObjectByType<SimulationManager>();
+        SimulationManager sm = GameManager.SimulationManager;
 
         selectionManager = FindFirstObjectByType<SelectionManager>();
 
-        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+        diplomacyManager = GameManager.DiplomacyManager;
 
         regionManager = sm?.RegionManager; 
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
         baseTilemap.ClearAllTiles();
 
@@ -205,6 +210,13 @@ public class TilemapVisualManager : MonoBehaviour
             }
 
             color = Color.white;
+        }
+
+        bool isSelected = selectionManager != null && selectionManager.GetLastClickedTile().HasValue && selectionManager.GetLastClickedTile().Value.x == x && selectionManager.GetLastClickedTile().Value.y == y;
+
+        if (isSelected)
+        {
+            color = Color.yellow;
         }
 
         baseTilemap.SetTile(tilePos, tileBase);

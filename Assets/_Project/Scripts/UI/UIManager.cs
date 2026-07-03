@@ -56,23 +56,28 @@ public class UIManager : MonoBehaviour
     private SimulationManager simulationManager;
     private TileManager tileManager;
 
+    void Awake()
+    {
+        GameManager.RegisterUIManager(this);
+    }
+
     void Start()
     {
-        economyManager = FindFirstObjectByType<EconomyManager>();
+        economyManager = GameManager.EconomyManager;
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
-        simulationManager = FindFirstObjectByType<SimulationManager>();
+        simulationManager = GameManager.SimulationManager;
 
-        tileManager = FindFirstObjectByType<TileManager>();
+        tileManager = GameManager.TileManager;
 
         selectionManager = FindFirstObjectByType<SelectionManager>();
 
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
         
-        politicsManager = FindFirstObjectByType<PoliticsManager>();
+        politicsManager = GameManager.PoliticsManager;
 
-        diplomacyManager = FindFirstObjectByType<DiplomacyManager>();
+        diplomacyManager = GameManager.DiplomacyManager;
 
         if (declareWarButton != null) declareWarButton.onClick.AddListener(OnDeclareWar);
 
@@ -86,7 +91,7 @@ public class UIManager : MonoBehaviour
 
         if (speedDecreaseButton != null) speedDecreaseButton.onClick.AddListener(OnSpeedDecrease);
 
-        WinConditionManager wcm = FindFirstObjectByType<WinConditionManager>();
+        WinConditionManager wcm = GameManager.WinConditionManager;
 
         if (wcm != null) wcm.OnVictory += ShowVictoryScreen;
     }

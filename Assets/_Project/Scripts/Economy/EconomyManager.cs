@@ -10,13 +10,18 @@ public class EconomyManager : MonoBehaviour
     private UnitManager unitManager;
     private FactionManager factionManager;
 
+    void Awake()
+    {
+        GameManager.RegisterEconomyManager(this);
+    }
+
     public void Initialize()
     {
-        tileManager = FindFirstObjectByType<TileManager>();
+        tileManager = GameManager.TileManager;
         
-        unitManager = FindFirstObjectByType<UnitManager>();
+        unitManager = GameManager.UnitManager;
 
-        factionManager = FindFirstObjectByType<FactionManager>();
+        factionManager = GameManager.FactionManager;
 
         maxFactions = factionManager.FactionCount;
 
