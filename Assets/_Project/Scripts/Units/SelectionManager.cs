@@ -17,17 +17,28 @@ public class SelectionManager : MonoBehaviour
 
     private UnitManager unitManager;
 
+    private ContextMenuManager contextMenuManager;
+
+    private TilemapVisualManager tilemapVisualManager;
+
     private Vector2Int? lastClickedTile = null;
 
-    public Vector2Int? LastClickedTile => lastClickedTile;
+    private bool forcedMapModeChange = false;
 
     void Awake()
     {
-        cam = Camera.main;
+        GameManager.RegisterSelectionManager(this);
 
+        cam = Camera.main;
+    }
+
+    void Start()
+    {
         unitManager = GameManager.UnitManager;
 
-        GameManager.RegisterSelectionManager(this);
+        contextMenuManager = GameManager.ContextMenuManager;
+
+        tilemapVisualManager = GameManager.TilemapVisualManager;
     }
 
     void Update()
@@ -64,6 +75,13 @@ public class SelectionManager : MonoBehaviour
 
                 lastClickedTile = null;
 
+                if (tilemapVisualManager != null && forcedMapModeChange)
+                {
+                    tilemapVisualManager.ChangeMapMode(0);
+
+                    forcedMapModeChange = false;
+                }
+
                 Rect worldRect = GetWorldRect(startMousePos, Input.mousePosition);
 
                 if (Input.GetKey(KeyCode.LeftShift))
@@ -97,7 +115,6 @@ public class SelectionManager : MonoBehaviour
                 Vector2 worldPoint = cam.ScreenToWorldPoint(Input.mousePosition);
 
                 bool clickedOnUnit = unitManager.GetUnitAtPosition(worldPoint).Count > 0;
-                bool clickedOnTile = tm != null && tm.WorldToTile(worldPoint) != null;
             
                 if (!clickedOnUnit && selectedUnits.Count > 0)
                 {
@@ -134,6 +151,43 @@ public class SelectionManager : MonoBehaviour
             worldPos.z = 0;
 
             unitManager.MoveUnits(selectedUnits, worldPos, true);
+        }
+        else if (Input.GetMouseButtonDown(1) && contextMenuManager != null)
+        {
+            Vector2 worldPoint = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
+
+            bool clickedOnUnit = unitManager.GetUnitAtPosition(worldPoint).Count > 0;
+            
+            if (tm != null)
+            {
+                if (clickedOnUnit) return;
+
+                if (worldPos.x >= 0 && worldPos.x < tm.width * tm.tileSize && worldPos.y >= 0 && worldPos.y < tm.height * tm.tileSize)
+                {
+                    lastClickedTile = tm.WorldToTile(worldPos);
+
+                    if (tilemapVisualManager != null && tilemapVisualManager.MapMode != 2)
+                    {
+                        tilemapVisualManager.ChangeMapMode(2);
+
+                        forcedMapModeChange = true;
+                    }
+                }
+                else
+                {
+                    lastClickedTile = null;
+
+                    if (tilemapVisualManager != null && forcedMapModeChange)
+                    {
+                        tilemapVisualManager.ChangeMapMode(0);
+
+                        forcedMapModeChange = false;
+                    }
+                }
+
+                contextMenuManager.Check(lastClickedTile);
+            }
         }
     }
 
@@ -183,6 +237,8 @@ public class SelectionManager : MonoBehaviour
     public void SetLastClickedTile(Vector2Int tilePos)
     {
         lastClickedTile = tilePos;
+
+        Debug.Log($"LastClickedTile set to: {GetLastClickedTile()}");
     }
 
     public Vector2Int? GetLastClickedTile() => lastClickedTile;

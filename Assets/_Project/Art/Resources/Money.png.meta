@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d6ce028c04608e842941b5147965232d
+guid: 3fd69b8571371bc479dc9be41649574f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5362735838549604449
-    second: Food_0
+      213: 5670732621190257608
+    second: Money_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Food_0
+      name: Money_0
       rect:
         serializedVersion: 2
         x: 0
@@ -108,15 +108,15 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 168710905d34c6a40800000000000000
-      internalID: 5362735838549604449
+      spriteID: 8cbd34e264d72be40800000000000000
+      internalID: 5670732621190257608
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: bfb4c4e8765103846acdedf9938d865a
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Food_0: 5362735838549604449
+      Money_0: 5670732621190257608
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

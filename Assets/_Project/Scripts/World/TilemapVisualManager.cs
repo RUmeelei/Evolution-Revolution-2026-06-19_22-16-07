@@ -34,6 +34,8 @@ public class TilemapVisualManager : MonoBehaviour
     private SelectionManager selectionManager;
     private DiplomacyManager diplomacyManager;
 
+    public int MapMode => mapMode;
+
     void Awake()
     {
         GameManager.RegisterTilemapVisualManager(this);
@@ -68,12 +70,15 @@ public class TilemapVisualManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.M))
         {
-            if (mapMode < 2)
-            {
-                mapMode++;
-            }
-            else mapMode = 0;
+            ChangeMapMode();
         }
+    }
+
+    public void ChangeMapMode(int mm = -1)
+    {
+        if (mm >= 0 && mm < 3) mapMode = mm; else if (mapMode < 2) mapMode++; else mapMode = 0;
+
+        RedrawVisibleTiles();
     }
 
     public void RedrawAllTiles()

@@ -224,7 +224,7 @@ public class UnitVisualManager : MonoBehaviour
                 }
                 else
                 {
-                    Color factionColor = enableFactionColors ? fd.factionColor : Color.white;
+                    Color factionColor = enableFactionColors ? fd.factionColor : humans[i].profession == Profession.Soldier ? Color.navyBlue : Color.white;
                     Color selectionColor = enableFactionColors ? fd.selectionColor : Color.green;
 
                     pool[mainIndex].color = selectionManager != null && selectionManager.IsSelected(i) ? selectionColor : factionColor;

@@ -141,7 +141,7 @@ public class AIManager : MonoBehaviour
                     if (humans[i].isAlive && humans[i].factionId == fid) currentUnitCount++;
                 }
         
-                if (currentUnitCount < Mathf.Min(economyManager.GetFood(fid) / 500, 150))
+                if (currentUnitCount < economyManager.GetFood(fid) / 500 && currentUnitCount < economyManager.GetGold(fid) / 100)
                 {
                     List<Vector2Int> factionTiles = new List<Vector2Int>();
                     
@@ -158,12 +158,18 @@ public class AIManager : MonoBehaviour
                         Vector2Int randomTile = factionTiles[Random.Range(0, factionTiles.Count)];
 
                         Vector2 worldPos = new Vector2(randomTile.x * tileManager.tileSize + tileManager.tileSize / 2f, randomTile.y * tileManager.tileSize + tileManager.tileSize / 2f);
+                        
+                        float mobilCost = 50f * 5f; // With upkeep cost considered
+                        float recruitFCost = (25f + 10f) * 5f; // Food
+                        float recruitGCost = (15 + 10f) * 5f; // Gold
 
-                        float cost = 50f;
-
-                        if (economyManager.GetFood(fid) >= cost)
+                        if (economyManager.GetFood(fid) >= recruitFCost && economyManager.GetGold(fid) >= recruitGCost)
                         {
-                            spawnManager.SpawnUnitWithCost(worldPos, fid, cost);
+                            spawnManager.RecruitUnit(worldPos, fid);
+                        }
+                        else if (economyManager.GetFood(fid) >= mobilCost)
+                        {
+                            spawnManager.MobilizeUnit(worldPos, fid);
                         }
                     }
                 }

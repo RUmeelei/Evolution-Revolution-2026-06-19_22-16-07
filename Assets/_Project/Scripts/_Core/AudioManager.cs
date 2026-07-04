@@ -14,7 +14,11 @@ public class AudioManager : MonoBehaviour
     [Header("Zoom-based Volume")]
     [SerializeField] private float minZoom = 2f;
     [SerializeField] private float maxZoom = 20f;
+    [SerializeField] private float minZoomVolume = 1f;
+    [SerializeField] private float maxZoomVolume = 0f;
     [SerializeField] private Camera mainCamera;
+
+    private float baseSFXVolume = 1f;
 
     [Header("Music")]
     [SerializeField] private AudioClip[] musicTracks;
@@ -54,8 +58,9 @@ public class AudioManager : MonoBehaviour
             sfxSources[i] = go.AddComponent<AudioSource>();
             sfxSources[i].outputAudioMixerGroup = mainMixer.FindMatchingGroups("SFX")[0];
             sfxSources[i].spatialBlend = 1f;
+            sfxSources[i].rolloffMode = AudioRolloffMode.Logarithmic;
             sfxSources[i].minDistance = 5f;
-            sfxSources[i].maxDistance = 50f;
+            sfxSources[i].maxDistance = 150f;
             sfxSources[i].playOnAwake = false;
         }
 
@@ -67,6 +72,16 @@ public class AudioManager : MonoBehaviour
         musicSource.spatialBlend = 0f;
 
         simulationManager = GameManager.SimulationManager;
+    }
+
+    void Update()
+    {
+        if (mainCamera == null) return;
+
+        float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, mainCamera.orthographicSize);
+        float targetVolume = baseSFXVolume * Mathf.Lerp(minZoomVolume, maxZoomVolume, zoomFactor);
+
+        mainMixer.SetFloat("SFXVolume", Mathf.Log10(targetVolume) * 100);
     }
     
     public void PlayClipAtPosition(AudioClip clip, Vector2 position)
@@ -80,13 +95,6 @@ public class AudioManager : MonoBehaviour
         if (mainCamera == null) return;
         
         if (simulationManager != null && simulationManager.SimulationSpeed > 3f) return;
-        
-        if ((minZoom >= maxZoom || maxZoom <= 0f) && mainCamera != null)
-        {
-            float fallbackVolume = Mathf.Clamp01(1f - (mainCamera.orthographicSize / 80f));
-
-            if (fallbackVolume <= 0f) return;
-        }
 
         AudioSource source = sfxSources[nextSfxIndex];
 
@@ -94,24 +102,6 @@ public class AudioManager : MonoBehaviour
         source.PlayOneShot(clip);
 
         nextSfxIndex = (nextSfxIndex + 1) % sfxSources.Length;
-    }
-
-    public void UpdateZoom(float currentZoom)
-    {
-        if (sfxSources == null) return;
-
-        float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, currentZoom);
-        float effectiveMaxDist = Mathf.Lerp(80f, 20f, zoomFactor);
-        float volume = 1f - Mathf.Clamp01(zoomFactor);
-
-        foreach (var source in sfxSources)
-        {
-            if (source != null)
-            {
-                source.maxDistance = effectiveMaxDist;
-                source.volume = volume;
-            }
-        }
     }
     
     public void SetMasterVolume(float value)
@@ -123,7 +113,7 @@ public class AudioManager : MonoBehaviour
 
     public void SetSFXVolume(float value)
     {
-        mainMixer.SetFloat("SFXVolume", Mathf.Log10(value) * 20);
+        baseSFXVolume = value;
 
         PlayerPrefs.SetFloat("SFXVolume", value);
     }

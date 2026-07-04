@@ -19,6 +19,9 @@ MonoBehaviour:
   startingHex: {x: 1, y: 1}
   factionColor: {r: 0, g: 0.27323264, b: 0.6666667, a: 1}
   startingFood: 250
+  startingGold: 50
+  startingStone: 150
+  startingWood: 200
   startingUnits: 5
   rulerCharacter: 1
   isPlayer: 0

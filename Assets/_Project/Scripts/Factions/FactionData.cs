@@ -24,6 +24,9 @@ public class FactionData : ScriptableObject
     public Color factionColor;
 
     public float startingFood = 250f;
+    public float startingGold = 50f;
+    public float startingStone = 150f;
+    public float startingWood = 200f;
 
     public int startingUnits = 5;
 

@@ -15,6 +15,9 @@ public struct TileData
     public int regionId;
 
     public float foodAmount;
+    public float goldAmount;
+    public float stoneAmount;
+    public float woodAmount;
 
     public float elevation;
 

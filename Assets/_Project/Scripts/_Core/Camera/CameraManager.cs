@@ -96,7 +96,5 @@ public class CameraManager : MonoBehaviour
         }
 
         cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, 10f * Time.deltaTime / smoothing);
-
-        AudioManager.Instance?.UpdateZoom(cam.orthographicSize);
     }
 }

@@ -96,21 +96,33 @@ public class TileManager : MonoBehaviour
                     {
                         tiles[i].tileType = TileType.Stone;
                         tiles[i].foodAmount = 0f;
+                        tiles[i].goldAmount = Random.Range(0, 2);
+                        tiles[i].stoneAmount = Random.Range(1, 2);
+                        tiles[i].woodAmount = 0f;
                     }
                     else if (moistureNoise < 0.3f + detailNoise * 0.1f)
                     {
                         tiles[i].tileType = TileType.Sand;
                         tiles[i].foodAmount = 0.2f;
+                        tiles[i].goldAmount = Random.Range(0, 1);
+                        tiles[i].stoneAmount = Random.Range(0, 1);
+                        tiles[i].woodAmount = 0f;
                     }
                     else if (moistureNoise > 0.6f - detailNoise * 0.1f && detailNoise > 0.5f)
                     {
                         tiles[i].tileType = TileType.Grass;
                         tiles[i].foodAmount = 2f;
+                        tiles[i].goldAmount = 0f;
+                        tiles[i].stoneAmount = 0f;
+                        tiles[i].woodAmount = Random.Range(0, 2);
                     }
                     else
                     {
                         tiles[i].tileType = TileType.Grass;
                         tiles[i].foodAmount = 1f;
+                        tiles[i].goldAmount = 0f;
+                        tiles[i].stoneAmount = 0f;
+                        tiles[i].woodAmount = Random.Range(0, 2);
                     }
                 }
 
@@ -140,6 +152,9 @@ public class TileManager : MonoBehaviour
                 {
                     tiles[i].tileType = TileType.Water;
                     tiles[i].foodAmount = 0f;
+                    tiles[i].goldAmount = 0f;
+                    tiles[i].stoneAmount = 0f;
+                    tiles[i].woodAmount = 0f;
                 }
 
                 tiles[i].unitsByFaction = new int[maxFactions];
