@@ -84,18 +84,23 @@ public class ContextMenuManager : MonoBehaviour
 
     void Update()
     {
-        if ((Input.GetMouseButtonDown(2) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D)) && (ownContextMenuPanel.activeSelf || otherContextMenuPanel.activeSelf))
+        // if ((Input.GetMouseButtonDown(2) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D)) && (ownContextMenuPanel.activeSelf || otherContextMenuPanel.activeSelf))
+        // {
+        //     HideOwnMenu();
+        //     HideOtherMenu();
+        // }
+        // else if (Input.GetMouseButtonDown(0) && (ownContextMenuPanel.activeSelf || otherContextMenuPanel.activeSelf))
+        // {
+        //     if (!RectTransformUtility.RectangleContainsScreenPoint(ownContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && !RectTransformUtility.RectangleContainsScreenPoint(otherContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition))
+        //     {
+        //         HideOwnMenu();
+        //         HideOtherMenu();
+        //     }
+        // }
+        if (!RectTransformUtility.RectangleContainsScreenPoint(ownContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && !RectTransformUtility.RectangleContainsScreenPoint(otherContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition))
         {
             HideOwnMenu();
             HideOtherMenu();
-        }
-        else if (Input.GetMouseButtonDown(0) && (ownContextMenuPanel.activeSelf || otherContextMenuPanel.activeSelf))
-        {
-            if (!RectTransformUtility.RectangleContainsScreenPoint(ownContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && !RectTransformUtility.RectangleContainsScreenPoint(otherContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition))
-            {
-                HideOwnMenu();
-                HideOtherMenu();
-            }
         }
     }
 
@@ -130,7 +135,7 @@ public class ContextMenuManager : MonoBehaviour
     {
         ownContextMenuPanel.SetActive(true);
 
-        ownContextMenuPanel.transform.position = screenPos + offset;
+        ownContextMenuPanel.transform.position = screenPos;
 
         contextMenuTitle.text = $"Тайл ({tilePos.x}, {tilePos.y})";
     }
@@ -144,7 +149,7 @@ public class ContextMenuManager : MonoBehaviour
     {
         otherContextMenuPanel.SetActive(true);
 
-        otherContextMenuPanel.transform.position = screenPos + offset;
+        otherContextMenuPanel.transform.position = screenPos;
 
         otherContextMenuTitle.text = $"Тайл ({tilePos.x}, {tilePos.y})";
     }

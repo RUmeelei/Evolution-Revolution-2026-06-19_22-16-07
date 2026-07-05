@@ -206,7 +206,7 @@ public class UnitManager : MonoBehaviour
 
         float pickRadius = 0.25f;
 
-        if (unitVisualManager != null) pickRadius = unitVisualManager.SpriteRadius;
+        if (unitVisualManager != null) pickRadius = unitVisualManager.SpriteRadius * 2.25f;
 
         for (int i = 0; i < humans.Length; i++)
         {
@@ -215,6 +215,8 @@ public class UnitManager : MonoBehaviour
             if ((humans[i].position == pos || Vector2.Distance(humans[i].position, pos) < pickRadius) && factionManager.IsPlayerFaction(humans[i].factionId))
             {
                 result.Add(i);
+
+                break;
 
                 // AudioManager.Instance?.PlayClipAtPosition(selectSound, humans[i].position);
             } 
