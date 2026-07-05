@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [Header("UI References")]
+    [SerializeField] private SettingsUI settingsUI;
+    
     public void NewGame()
     {
         SceneManager.LoadScene("Game");
@@ -15,7 +18,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void OpenSettings()
     {
-        Debug.Log("Настройки пока не реализованы.");
+        settingsUI?.OpenSettings();
     }
 
     public void ExitGame()

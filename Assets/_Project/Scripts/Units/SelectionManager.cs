@@ -25,6 +25,8 @@ public class SelectionManager : MonoBehaviour
 
     private bool forcedMapModeChange = false;
 
+    private bool wasPointerOverUI = false;
+
     void Awake()
     {
         GameManager.RegisterSelectionManager(this);
@@ -45,19 +47,22 @@ public class SelectionManager : MonoBehaviour
     {
         TileManager tm = GameManager.TileManager;
 
-        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButtonUp(0) && wasPointerOverUI) wasPointerOverUI = false;
+
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject() && !wasPointerOverUI)
         {
             startMousePos = Input.mousePosition;
         }
+        else if (Input.GetMouseButtonDown(0)) wasPointerOverUI = true;
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject() && !wasPointerOverUI)
         {
             Vector2 p1 = startMousePos;
             Vector2 p2 = Input.mousePosition;
 
             Vector2 p3 = p1 - p2;
 
-            if (p3.sqrMagnitude > 200 && !EventSystem.current.IsPointerOverGameObject())
+            if (p3.sqrMagnitude > 200)
             {
                 isDragging = true;
             }
@@ -67,7 +72,7 @@ public class SelectionManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject() && !wasPointerOverUI)
         {
             if (isDragging)
             {
@@ -145,7 +150,7 @@ public class SelectionManager : MonoBehaviour
             isDragging = false;
         }
 
-        if (Input.GetMouseButtonDown(1) && selectedUnits.Count > 0 && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButtonDown(1) && selectedUnits.Count > 0 && !EventSystem.current.IsPointerOverGameObject() && !wasPointerOverUI)
         {
             Vector3 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
             worldPos.z = 0;

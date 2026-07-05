@@ -64,7 +64,9 @@ public class AudioManager : MonoBehaviour
             sfxSources[i].playOnAwake = false;
         }
 
-        GameObject mgo = new GameObject($"Music_Source");
+        GameObject mgo = new GameObject("Music_Source");
+
+        mgo.transform.SetParent(transform);
     
         musicSource = mgo.AddComponent<AudioSource>();
         musicSource.outputAudioMixerGroup = mainMixer.FindMatchingGroups("Music")[0];
@@ -76,12 +78,17 @@ public class AudioManager : MonoBehaviour
 
     void Update()
     {
-        if (mainCamera == null) return;
+        if (mainCamera == null) mainCamera = Camera.main;
 
         float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, mainCamera.orthographicSize);
         float targetVolume = baseSFXVolume * Mathf.Lerp(minZoomVolume, maxZoomVolume, zoomFactor);
 
         mainMixer.SetFloat("SFXVolume", Mathf.Log10(targetVolume) * 100);
+
+        if (!musicSource.isPlaying)
+        {
+            PlayRandomMusic();
+        }
     }
     
     public void PlayClipAtPosition(AudioClip clip, Vector2 position)
