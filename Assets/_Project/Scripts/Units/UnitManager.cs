@@ -80,6 +80,8 @@ public class UnitManager : MonoBehaviour
             attackTimer = 0f,
 
             isAlive = true,
+
+            isAuto = false,
             
             targetPosition = pos,
 
@@ -101,6 +103,25 @@ public class UnitManager : MonoBehaviour
                 humans[i] = human;
                 aliveCount++;
                 return;
+            }
+        }
+    }
+
+    public void SwitchAutonomy(List<int> indices)
+    {
+        int auto = 0;
+        int nonAuto = 0;
+
+        foreach (int idx in indices)
+        {
+            if (idx >= 0 && idx < humans.Length && humans[idx].isAlive)
+            {
+                if (humans[idx].isAuto) auto++;
+                if (!humans[idx].isAuto) nonAuto++;
+
+                if (nonAuto > 0) humans[idx].isAuto = true; else if (nonAuto <= 0) humans[idx].isAuto = false;
+
+                Debug.Log($"UnitManager switch autonomy for {idx} ({humans[idx].isAuto})");
             }
         }
     }

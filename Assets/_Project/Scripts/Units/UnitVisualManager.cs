@@ -12,9 +12,6 @@ public class UnitVisualManager : MonoBehaviour
     [SerializeField] private bool enableDamageFlash = true;
     [SerializeField] private bool enableFactionColors = true;
 
-    private Dictionary<int, float> blinkTimers = new();
-    private Dictionary<int, bool> eyesClosed = new();
-
     [Header("Bars")]
     [SerializeField] private SpriteRenderer healthBarPrefab;
     [SerializeField] private SpriteRenderer staminaBarPrefab;
@@ -31,6 +28,14 @@ public class UnitVisualManager : MonoBehaviour
     [SerializeField] private Sprite desertingIcon;
     [SerializeField] private Sprite lowLoyaltyIcon;
     [SerializeField] private Sprite avoidingIcon;
+    [SerializeField] private int maxStatusIconsPerUnit = 3;
+    [SerializeField] private Vector2[] statusIconOffsets = new Vector2[]
+    {
+        new Vector2(0f, 0.6f),
+        new Vector2(0.15f, 0.6f),
+        new Vector2(-0.15f, 0.6f)
+    };
+    private  Sprite[] iconsToShow;
 
     [Header("Combat Feedback")]
     [SerializeField] private Color damageColor = Color.red;
@@ -45,11 +50,6 @@ public class UnitVisualManager : MonoBehaviour
     public float SpriteRadius => spriteRadius;
 
     private SpriteRenderer[] pool;
-
-    private float cachedPlayerLoyalty = 50f;
-    private int lastLoyaltyFrame = -1;
-
-    private int playerFactionId = -2;
 
     private SimulationManager simulationManager;
     private SelectionManager selectionManager;
@@ -106,16 +106,19 @@ public class UnitVisualManager : MonoBehaviour
             staminaBarPool[i].sortingOrder = 1;
         }
 
-        statusIconPool = new SpriteRenderer[poolSize];
+        int statusPoolSize = poolSize * maxStatusIconsPerUnit;
 
-        for (int i = 0; i < poolSize; i++)
+        statusIconPool = new SpriteRenderer[statusPoolSize];
+
+        for (int i = 0; i < statusPoolSize; i++)
         {
             statusIconPool[i] = Instantiate(statusIconPrefab, transform);
-
             statusIconPool[i].enabled = false;
             statusIconPool[i].sortingLayerName = "Units";
             statusIconPool[i].sortingOrder = 2;
         }
+                     
+        iconsToShow = new Sprite[maxStatusIconsPerUnit];
     }
 
     void Update()
@@ -138,26 +141,11 @@ public class UnitVisualManager : MonoBehaviour
         
         if (simulationManager == null) simulationManager = GameManager.SimulationManager;
 
-        if (selectionManager == null) selectionManager = FindFirstObjectByType<SelectionManager>();
+        if (selectionManager == null) selectionManager = GameManager.SelectionManager;
 
         if (factionManager == null) factionManager = GameManager.FactionManager;
 
         if (politicsManager == null) politicsManager = GameManager.PoliticsManager;
-
-        if (lastLoyaltyFrame != Time.frameCount)
-        {
-            lastLoyaltyFrame = Time.frameCount;
-
-            if (playerFactionId == -2)
-            {
-                for (int i = 0; i < factionManager.FactionCount; i++)
-                {
-                    if (factionManager.IsPlayerFaction(i)) playerFactionId = i;
-                }
-            }
-
-            cachedPlayerLoyalty = politicsManager.GetFactionLoyalty(playerFactionId);
-        }
 
         float lastTickTime = simulationManager?.LastTickTime ?? Time.time;
         float tickInterval = simulationManager?.TickInterval ?? 0.1f;
@@ -194,23 +182,7 @@ public class UnitVisualManager : MonoBehaviour
 
                 if (fd?.unitSpriteData == null) continue;
                 
-                if (!blinkTimers.ContainsKey(i))
-                {
-                    blinkTimers[i] = Random.Range(1f, 4f);
-
-                    eyesClosed[i] = false;
-                }
-                
-                blinkTimers[i] -= Time.deltaTime;
-
-                if (blinkTimers[i] <= 0f)
-                {
-                    eyesClosed[i] = !eyesClosed[i];
-
-                    blinkTimers[i] = eyesClosed[i] ? Random.Range(0.1f, 0.3f) : Random.Range(2f, 5f);
-                }
-                
-                Sprite sprite = fd.unitSpriteData.GetSprite(humans[i].velocity, eyesClosed[i]);
+                Sprite sprite = fd.unitSpriteData.GetSprite(humans[i].velocity, IsEyesClosed(i, Time.time));
 
                 if (sprite != null) pool[mainIndex].sprite = sprite;
                 
@@ -255,33 +227,30 @@ public class UnitVisualManager : MonoBehaviour
                 staminaBarPool[barIndex].color = Color.Lerp(Color.yellow, Color.cyan, staminaRatio);
                 barIndex++;
             }
-                     
-            if (iconIndex < statusIconPool.Length)
+
+            int iconCount = 0;
+
+            if (humans[i].isExhausted && iconCount < maxStatusIconsPerUnit) iconsToShow[iconCount++] = exhaustedIcon;
+            if (humans[i].stamina < 50f && iconCount < maxStatusIconsPerUnit) iconsToShow[iconCount++] = tiredIcon;
+            if ((humans[i].isAvoiding || humans[i].isAuto) && iconCount < maxStatusIconsPerUnit) iconsToShow[iconCount++] = avoidingIcon;
+
+            float factionLoyalty = politicsManager.GetFactionLoyalty(humans[i].factionId);
+
+            if (factionLoyalty < 30f && iconCount < maxStatusIconsPerUnit) iconsToShow[iconCount++] = lowLoyaltyIcon;
+            if (factionLoyalty < 10f && iconCount < maxStatusIconsPerUnit) iconsToShow[iconCount++] = desertingIcon;
+            
+            for (int j = 0; j < iconCount && iconIndex < statusIconPool.Length; j++)
             {
                 SpriteRenderer icon = statusIconPool[iconIndex];
-    
-                icon.enabled = false;
-                         
-                icon.transform.position = (Vector3)(displayPos + Vector2.up * 0.6f);
 
-                if (humans[i].isExhausted) { icon.sprite = exhaustedIcon; icon.enabled = true; }
-                else if (humans[i].stamina < 50f) { icon.sprite = tiredIcon; icon.enabled = true; }
-                else if (humans[i].isAvoiding) { icon.sprite = avoidingIcon; icon.enabled = true; }
-                else if (cachedPlayerLoyalty < 30f) { icon.sprite = lowLoyaltyIcon; icon.enabled = true; }
-                else if (cachedPlayerLoyalty < 10f) { icon.sprite = desertingIcon; icon.enabled = true; }
+                icon.enabled = true;
+                icon.sprite = iconsToShow[j];
+
+                Vector2 offset = (j < statusIconOffsets.Length) ? statusIconOffsets[j] : statusIconOffsets[statusIconOffsets.Length - 1];
+
+                icon.transform.position = (Vector3)(displayPos + offset);
 
                 iconIndex++;
-            }
-        }
-        
-        if (Time.frameCount % 100 == 0)
-        {
-            var dead = blinkTimers.Keys.Where(k => k >= humans.Length || !humans[k].isAlive).ToList();
-
-            foreach (var key in dead)
-            {
-                blinkTimers.Remove(key);
-                eyesClosed.Remove(key);
             }
         }
         
@@ -294,5 +263,16 @@ public class UnitVisualManager : MonoBehaviour
         }
 
         for (int i = iconIndex; i < statusIconPool.Length; i++) statusIconPool[i].enabled = false;
+    }
+                
+    bool IsEyesClosed(int index, float time)
+    {
+        float period = 3.5f + (index % 7) * 0.2f;
+
+        float phase = (index * 1.7f) % period;
+    
+        float t = (time + phase) % period;
+
+        return t < 0.15f;
     }
 }

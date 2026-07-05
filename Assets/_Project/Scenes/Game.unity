@@ -4296,7 +4296,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 818345252}
-  - component: {fileID: 818345253}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -4344,19 +4343,6 @@ Transform:
   - {fileID: 1563698683}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &818345253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 818345251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f389ae706f0e85441ae167e354a86edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectionManager
-  cam: {fileID: 0}
 --- !u!1 &829007780
 GameObject:
   m_ObjectHideFlags: 0
@@ -10669,6 +10655,11 @@ MonoBehaviour:
   desertingIcon: {fileID: -2756771465657322386, guid: c09fabdca47f0b14cbc0565491aeb9db, type: 3}
   lowLoyaltyIcon: {fileID: -4294177270076207721, guid: 755f2eba6ff621241a83428a93048376, type: 3}
   avoidingIcon: {fileID: 4758650664241871959, guid: 0358f9871cca9bb4f96a7d792717e65d, type: 3}
+  maxStatusIconsPerUnit: 3
+  statusIconOffsets:
+  - {x: 0, y: 0.6}
+  - {x: 0.15, y: 0.6}
+  - {x: -0.15, y: 0.6}
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   damageFlashDuration: 0.2
 --- !u!1 &1643742247

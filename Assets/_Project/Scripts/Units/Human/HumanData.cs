@@ -20,6 +20,8 @@ public struct HumanData
 
     public bool isAlive;
 
+    public bool isAuto;
+
     public Vector2 targetPosition;
     public Vector2 avoidTargetPosition;
     public bool hasTarget;

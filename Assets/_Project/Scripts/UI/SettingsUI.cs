@@ -3,8 +3,6 @@ using UnityEngine.UI;
 
 public class SettingsUI : MonoBehaviour
 {
-    public static SettingsUI Instance { get; private set; }
-
     [Header("UI References")]
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Slider masterVolumeSlider;
@@ -13,18 +11,6 @@ public class SettingsUI : MonoBehaviour
     [SerializeField] private Button closeButton;
 
     private AudioManager audioManager;
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     void Start()
     {

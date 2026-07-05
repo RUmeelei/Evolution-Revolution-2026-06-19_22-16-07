@@ -83,7 +83,7 @@ public class AudioManager : MonoBehaviour
         float zoomFactor = Mathf.InverseLerp(minZoom, maxZoom, mainCamera.orthographicSize);
         float targetVolume = baseSFXVolume * Mathf.Lerp(minZoomVolume, maxZoomVolume, zoomFactor);
 
-        mainMixer.SetFloat("SFXVolume", Mathf.Log10(targetVolume) * 100);
+        mainMixer.SetFloat("SFXVolume", Mathf.Max(-80f, Mathf.Log10(targetVolume) * 100));
 
         if (!musicSource.isPlaying)
         {
@@ -113,7 +113,7 @@ public class AudioManager : MonoBehaviour
     
     public void SetMasterVolume(float value)
     {
-        mainMixer.SetFloat("MasterVolume", Mathf.Log10(value) * 20);
+        mainMixer.SetFloat("MasterVolume", Mathf.Max(-80f, Mathf.Log10(value) * 20));
 
         PlayerPrefs.SetFloat("MasterVolume", value);
     }
@@ -127,7 +127,7 @@ public class AudioManager : MonoBehaviour
 
     public void SetMusicVolume(float value)
     {
-        mainMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 20);
+        mainMixer.SetFloat("MusicVolume", Mathf.Max(-80f, Mathf.Log10(value) * 20));
 
         PlayerPrefs.SetFloat("MusicVolume", value);
     }

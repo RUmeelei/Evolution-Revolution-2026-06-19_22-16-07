@@ -54,7 +54,7 @@ public class AIManager : MonoBehaviour
 
         for (int i = 0; i < humans.Length; i++)
         {
-            if (!humans[i].isAlive || factionManager.IsPlayerFaction(humans[i].factionId)) continue;
+            if (!humans[i].isAlive || (factionManager.IsPlayerFaction(humans[i].factionId) && !humans[i].isAuto)) continue;
             
             if (humans[i].hasTarget || humans[i].isExhausted) continue;
 

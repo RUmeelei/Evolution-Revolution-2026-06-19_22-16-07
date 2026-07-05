@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class SelectionManager : MonoBehaviour
 {
+    public static SelectionManager Instance { get; private set; }
+
     [Header("Main")]
     [SerializeField] private Camera cam;
 
@@ -29,6 +31,15 @@ public class SelectionManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+
+            return;
+        }
+
+        Instance = this;
+
         GameManager.RegisterSelectionManager(this);
 
         cam = Camera.main;
@@ -194,6 +205,13 @@ public class SelectionManager : MonoBehaviour
                 contextMenuManager.Check(lastClickedTile);
             }
         }
+
+        if (Input.GetKeyUp(KeyCode.V) && selectedUnits.Count > 0)
+        {
+            unitManager.SwitchAutonomy(selectedUnits);
+
+            Debug.Log($"SelectionManager switch autonomy");
+        }
     }
 
     Rect GetWorldRect(Vector2 screenPos1, Vector2 screenPos2)
@@ -242,8 +260,6 @@ public class SelectionManager : MonoBehaviour
     public void SetLastClickedTile(Vector2Int tilePos)
     {
         lastClickedTile = tilePos;
-
-        Debug.Log($"LastClickedTile set to: {GetLastClickedTile()}");
     }
 
     public Vector2Int? GetLastClickedTile() => lastClickedTile;
