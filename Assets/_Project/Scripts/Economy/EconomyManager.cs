@@ -54,16 +54,34 @@ public class EconomyManager : MonoBehaviour
         {
             if (tiles[i].factionId >= 0 && tiles[i].factionId < maxFactions)
             {
-                factionFood[tiles[i].factionId] += tiles[i].foodAmount * delta;
-                factionGold[tiles[i].factionId] += tiles[i].goldAmount * delta;
-                factionStone[tiles[i].factionId] += tiles[i].stoneAmount * delta;
-                factionWood[tiles[i].factionId] += tiles[i].woodAmount * delta;
+                float foodIncome = 0f;
+                float goldIncome = 0f;
+                float stoneIncome = 0f;
+                float woodIncome = 0f;
+
+                foodIncome += tiles[i].foodAmount;
+                goldIncome += tiles[i].goldAmount;
+                stoneIncome += tiles[i].stoneAmount;
+                woodIncome += tiles[i].woodAmount;
+
+                if (tiles[i].buildings != null)
+                {
+                    foreach (var building in tiles[i].buildings)
+                    {
+                        if (building.type == BuildingType.Farm) foodIncome += 3f;
+                        else if (building.type == BuildingType.Temple) goldIncome += 1f;
+                        else if (building.type == BuildingType.Market) {goldIncome += 2f; foodIncome += 1f; stoneIncome += 1f; woodIncome += 1f;};
+                    }
+                }
+
+                factionFood[tiles[i].factionId] += foodIncome * delta;
+                factionGold[tiles[i].factionId] += goldIncome * delta;
+                factionStone[tiles[i].factionId] += stoneIncome * delta;
+                factionWood[tiles[i].factionId] += woodIncome * delta;
             } 
         }
         
         HumanData[] humans = unitManager.Humans;
-
-        float upkeepPerUnit = 15f;
 
         for (int i = 0; i < humans.Length; i++)
         {
@@ -73,7 +91,12 @@ public class EconomyManager : MonoBehaviour
 
             if (fid < 0 || fid >= maxFactions) continue;
 
-            factionFood[fid] -= upkeepPerUnit * delta;
+            SpendFood(fid, 15f * delta);
+
+            if (humans[i].profession == Profession.Soldier)
+            {
+                SpendGold(fid, 5f * delta);
+            }
         }
         
         for (int f = 0; f < maxFactions; f++)
@@ -86,7 +109,20 @@ public class EconomyManager : MonoBehaviour
 
                     humans[i].hp -= 5f * delta;
                 }
+
                 factionFood[f] = 0;
+            }
+
+            if (factionGold[f] < 0)
+            {
+                for (int i = 0; i < humans.Length; i++)
+                {
+                    if (!humans[i].isAlive || humans[i].factionId != f || humans[i].profession != Profession.Soldier || Random.value > 0.2f) continue;
+
+                    unitManager.HumanDeath(i);
+                }
+
+                factionGold[f] = 0;
             }
         }
     }

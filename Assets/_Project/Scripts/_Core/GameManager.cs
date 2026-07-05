@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public static WinConditionManager WinConditionManager { get; private set; }
     public static SimulationManager SimulationManager { get; private set; }
     public static RegionManager RegionManager { get; private set; }
-    // public static BuildingManager BuildingManager { get; private set; }
+    public static BuildingManager BuildingManager { get; private set; }
     public static SelectionManager SelectionManager { get; private set; }
     public static CameraManager CameraManager { get; private set; }
     public static AudioManager AudioManager { get; private set; }
@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     public static void RegisterWinConditionManager(WinConditionManager manager) => WinConditionManager = manager;
     public static void RegisterSimulationManager(SimulationManager manager) => SimulationManager = manager;
     public static void RegisterRegionManager(RegionManager manager) => RegionManager = manager;
-    // public static void RegisterBuildingManager(BuildingManager manager) => BuildingManager = manager;
+    public static void RegisterBuildingManager(BuildingManager manager) => BuildingManager = manager;
     public static void RegisterSelectionManager(SelectionManager manager) => SelectionManager = manager;
     public static void RegisterCameraManager(CameraManager manager) => CameraManager = manager;
     public static void RegisterAudioManager(AudioManager manager) => AudioManager = manager;

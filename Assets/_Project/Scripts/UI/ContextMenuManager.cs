@@ -70,6 +70,14 @@ public class ContextMenuManager : MonoBehaviour
 
         if (spawnManager != null && recruitUnitButton != null) recruitUnitButton.onClick.AddListener(() => SpawnUnit(reg : true)); else if (recruitUnitButton != null) recruitUnitButton.interactable = false;
 
+        if (buildFarmButton != null) buildFarmButton.onClick.AddListener(() => BuildBuilding(BuildingType.Farm));
+
+        if (buildMarketButton != null) buildMarketButton.onClick.AddListener(() => BuildBuilding(BuildingType.Market));
+
+        if (buildWallButton != null) buildWallButton.onClick.AddListener(() => BuildBuilding(BuildingType.Wall));
+
+        if (buildTempleButton != null) buildTempleButton.onClick.AddListener(() => BuildBuilding(BuildingType.Temple));
+
         ownContextMenuPanel.SetActive(false);
         otherContextMenuPanel.SetActive(false);
     }
@@ -161,6 +169,23 @@ public class ContextMenuManager : MonoBehaviour
         if (tile.factionId == playerFaction)
         {
             if (reg) spawnManager.RecruitUnit(targetPos, playerFaction); else spawnManager.MobilizeUnit(targetPos, playerFaction);
+        }
+
+        HideOwnMenu();
+        HideOtherMenu();
+    }
+
+    void BuildBuilding(BuildingType type)
+    {
+        Vector2Int? tilePos = selectionManager?.GetLastClickedTile();
+
+        if (!tilePos.HasValue) return;
+
+        BuildingManager buildingManager = GameManager.BuildingManager;
+
+        if (buildingManager != null)
+        {
+            buildingManager.BuildBuilding(tilePos.Value, type, playerFaction);
         }
 
         HideOwnMenu();

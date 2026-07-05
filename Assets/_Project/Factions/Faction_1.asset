@@ -19,8 +19,11 @@ MonoBehaviour:
   startingHex: {x: 5, y: 5}
   factionColor: {r: 0, g: 0.509434, b: 0, a: 1}
   startingFood: 250
+  startingGold: 50
+  startingStone: 150
+  startingWood: 200
   startingUnits: 5
   rulerCharacter: 3
-  isPlayer: 0
+  isPlayer: 1
   unitSprite: {fileID: 2269961892177271623, guid: 6eb76dbef940ab64aa0d40c879f89e74, type: 3}
   selectionColor: {r: 1, g: 0, b: 0, a: 1}

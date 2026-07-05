@@ -233,20 +233,15 @@ public class PoliticsManager : MonoBehaviour
 
                 if (found)
                 {
-                    bestTile.buildings.Add(new BuildingData
+                    BuildingManager buildingManager = GameManager.BuildingManager;
+                    if (buildingManager != null)
                     {
-                        type = neededBuilding,
-                        level = 1,
-                        factionId = f
-                    });
-
-                    tileManager.AddBuildingCount(f, neededBuilding);
-
-                    TilemapVisualManager tvm = GameManager.TilemapVisualManager;
-
-                    tvm?.UpdateBuildingTile(bestPos.x, bestPos.y, bestTile);
-
-                    break;
+                        buildingManager.BuildBuilding(bestPos, neededBuilding, f);
+                    }
+                    else
+                    {
+                        Debug.LogError("BuildingManager не найден!");
+                    }
                 }
             }
         }
