@@ -97,7 +97,7 @@ public class ContextMenuManager : MonoBehaviour
         //         HideOtherMenu();
         //     }
         // }
-        if (!RectTransformUtility.RectangleContainsScreenPoint(ownContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && !RectTransformUtility.RectangleContainsScreenPoint(otherContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition))
+        if (!RectTransformUtility.RectangleContainsScreenPoint(ownContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && !RectTransformUtility.RectangleContainsScreenPoint(otherContextMenuPanel.GetComponent<RectTransform>(), Input.mousePosition) && (ownContextMenuPanel.activeSelf || otherContextMenuPanel.activeSelf))
         {
             HideOwnMenu();
             HideOtherMenu();
@@ -190,7 +190,7 @@ public class ContextMenuManager : MonoBehaviour
 
         if (buildingManager != null)
         {
-            buildingManager.BuildBuilding(tilePos.Value, type, playerFaction);
+            buildingManager.BuildBuilding(tilePos.Value, type, playerFaction, true);
         }
 
         HideOwnMenu();

@@ -109,19 +109,30 @@ public class UnitManager : MonoBehaviour
 
     public void SwitchAutonomy(List<int> indices)
     {
-        int auto = 0;
-        int nonAuto = 0;
+        if (indices == null || indices.Count == 0) return;
+
+        bool hasNonAuto = false;
 
         foreach (int idx in indices)
         {
             if (idx >= 0 && idx < humans.Length && humans[idx].isAlive)
             {
-                if (humans[idx].isAuto) auto++;
-                if (!humans[idx].isAuto) nonAuto++;
+                if (!humans[idx].isAuto)
+                {
+                    hasNonAuto = true;
+                    
+                    break;
+                }
+            }
+        }
 
-                if (nonAuto > 0) humans[idx].isAuto = true; else if (nonAuto <= 0) humans[idx].isAuto = false;
+        bool makeAuto = hasNonAuto;
 
-                Debug.Log($"UnitManager switch autonomy for {idx} ({humans[idx].isAuto})");
+        foreach (int idx in indices)
+        {
+            if (idx >= 0 && idx < humans.Length && humans[idx].isAlive)
+            {
+                humans[idx].isAuto = makeAuto;
             }
         }
     }

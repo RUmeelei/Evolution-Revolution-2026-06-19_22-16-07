@@ -34,14 +34,12 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-
-            return;
-        }
-
         Instance = this;
+        
+        if (transform.parent != null)
+        {
+            transform.SetParent(null);
+        }
 
         DontDestroyOnLoad(gameObject);
 
@@ -94,6 +92,8 @@ public class AudioManager : MonoBehaviour
     public void PlayClipAtPosition(AudioClip clip, Vector2 position)
     {
         if (clip == null) return;
+
+        if (simulationManager == null) simulationManager = GameManager.SimulationManager;
 
         if (sfxSources == null || sfxSources.Length == 0) return;
         

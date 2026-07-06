@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class SelectionManager : MonoBehaviour
 {
-    public static SelectionManager Instance { get; private set; }
-
     [Header("Main")]
     [SerializeField] private Camera cam;
 
@@ -31,15 +29,6 @@ public class SelectionManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-
-            return;
-        }
-
-        Instance = this;
-
         GameManager.RegisterSelectionManager(this);
 
         cam = Camera.main;
